@@ -1,9 +1,10 @@
 ﻿using System;
+using System.IO;
 using System.Threading.Tasks;
-using DSharpPlus;
-using DSharpPlus.EventArgs;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 
-namespace discord_sandbot
+namespace DiscordSandbot
 {
     class Program
     {
@@ -12,24 +13,31 @@ namespace discord_sandbot
             MainAsync().GetAwaiter().GetResult();
         }
 
-        static async Task MainAsync()
+        private static async Task MainAsync()
         {
-            var discord = new DiscordClient(new DiscordConfiguration()
-            {
-                Token = "MY TOKEN",
-                TokenType = TokenType.Bot
-            });
+            var serviceCollection = new ServiceCollection();
+            ConfigureServices(serviceCollection);
 
-            discord.MessageCreated += OnDiscordMessageCreated;
+            IServiceProvider serviceProvider = serviceCollection.BuildServiceProvider();
 
-            await discord.ConnectAsync();
-            await Task.Delay(-1);
+            await serviceProvider.GetService<App>().RunAsync();
         }
 
-        static async Task OnDiscordMessageCreated(MessageCreateEventArgs args)
+        private static void ConfigureServices(IServiceCollection services)
         {
-            if (args.Message.Content == "ping")
-                await args.Message.RespondAsync("pong");
+            var builder = new ConfigurationBuilder()
+                .SetBasePath(Directory.GetParent(AppContext.BaseDirectory).FullName)
+                .AddJsonFile("appsettings.json", false)
+                .AddJsonFile("appsettings.Local.json", true)
+                .Build();
+
+            var configuration = new Configuration();
+
+            ConfigurationBinder.Bind(builder, configuration);
+
+            services.AddSingleton<Configuration>(configuration);
+
+            services.AddTransient<App>();
         }
     }
 }
