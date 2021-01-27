@@ -76,5 +76,41 @@ namespace DiscordSandbot.Database
                 return await connection.QueryAsync<dynamic>("SELECT * FROM LogEmoji");
             }
         }
+
+        public async Task<IEnumerable<dynamic>> GetAllUsersOfEmojiAsync(string emojiId)
+        {
+            using (var connection = new SqliteConnection(_configuration.ConnectionString))
+            {
+                var sb = new StringBuilder();
+                sb.Append(" SELECT * ");
+                sb.Append(" FROM LogEmoji ");
+                sb.Append(" WHERE EmojiId = @emojiId ");
+
+                var parameters = new
+                {
+                    emojiId
+                };
+
+                return await connection.QueryAsync<dynamic>(sb.ToString(), parameters);
+            }
+        }
+
+        public async Task<IEnumerable<dynamic>> GetAllEmojisOfUserAsync(string username)
+        {
+            using (var connection = new SqliteConnection(_configuration.ConnectionString))
+            {
+                var sb = new StringBuilder();
+                sb.Append(" SELECT * ");
+                sb.Append(" FROM LogEmoji ");
+                sb.Append(" WHERE Username = @username ");
+
+                var parameters = new
+                {
+                    username
+                };
+
+                return await connection.QueryAsync<dynamic>(sb.ToString(), parameters);
+            }
+        }
     }
 }
