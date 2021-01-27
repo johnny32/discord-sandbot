@@ -42,7 +42,7 @@ namespace DiscordSandbot.Discord
 
         [Command("listEmojis")]
         [Description("Lists all the custom emojis and ranks them by most used.")]
-        public async Task ListEmojisAsync(CommandContext context, string arg)
+        public async Task ListEmojisAsync(CommandContext context, string arg = null)
         {
             try
             {
@@ -125,7 +125,31 @@ namespace DiscordSandbot.Discord
 
         private async Task ListAllEmojisOfUserAsync(CommandContext context, string username)
         {
+            var results = await _database.GetAllEmojisOfUserAsync(username);
 
+            if (!results.Any())
+                return;
+
+            var sb = new StringBuilder();
+            sb.AppendLine($"{username} has used the emojis:");
+
+            var groupByEmoji = results
+                .GroupBy(row => row.EmojiId)
+                .OrderByDescending(g => g.Count());
+
+            foreach (var group in groupByEmoji)
+            {
+                DiscordEmoji emoji = DiscordEmoji.FromName(context.Client, group.Key);
+
+                DateTime lastUsed = group
+                    .Select(row => DateTime.Parse(row.MessageTimestamp))
+                    .OrderByDescending(g => g)
+                    .First();
+
+                sb.AppendLine($"{emoji} a total of {group.Count()} times. It was used last on {lastUsed.ToString("dd/MM/yyyy HH:mm:ss")}.");
+            }
+
+            await context.RespondAsync(sb.ToString());
         }
     }
 }
