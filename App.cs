@@ -33,10 +33,6 @@ namespace DiscordSandbot
             commands.RegisterCommands<CommandHandler>();
 
             discord.MessageCreated += _discordMessageHandler.HandleMessageAsync;
-            /*discord.MessageCreated += async (c, e) =>
-            {
-                await _discordMessageHandler.HandleMessageAsync(c, e);
-            }*/
 
             await discord.ConnectAsync();
             await Task.Delay(-1);
