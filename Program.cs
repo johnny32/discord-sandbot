@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Threading.Tasks;
+using DiscordSandbot.Database;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -36,6 +37,7 @@ namespace DiscordSandbot
             ConfigurationBinder.Bind(builder, configuration);
 
             services.AddSingleton<Configuration>(configuration);
+            services.AddSingleton<IDatabaseService, DatabaseService>();
 
             services.AddTransient<App>();
         }

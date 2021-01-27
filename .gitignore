@@ -352,3 +352,6 @@ MigrationBackup/
 
 # Local app settings
 appsettings.Local.json
+
+# SQLite database
+DiscordSandbot.db
