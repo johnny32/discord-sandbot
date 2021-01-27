@@ -10,6 +10,7 @@ namespace DiscordSandbot
 {
     class Program
     {
+        public static IServiceProvider Services { get; private set; }
         static void Main(string[] args)
         {
             MainAsync().GetAwaiter().GetResult();
@@ -20,9 +21,9 @@ namespace DiscordSandbot
             var serviceCollection = new ServiceCollection();
             ConfigureServices(serviceCollection);
 
-            IServiceProvider serviceProvider = serviceCollection.BuildServiceProvider();
+            Services = serviceCollection.BuildServiceProvider();
 
-            await serviceProvider.GetService<App>().RunAsync();
+            await Services.GetService<App>().RunAsync();
         }
 
         private static void ConfigureServices(IServiceCollection services)

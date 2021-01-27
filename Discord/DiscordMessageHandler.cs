@@ -3,6 +3,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using DiscordSandbot.Database;
+using DSharpPlus;
 using DSharpPlus.Entities;
 using DSharpPlus.EventArgs;
 
@@ -19,12 +20,36 @@ namespace DiscordSandbot.Discord
             _database = database;
         }
 
-        public async Task HandleMessageAsync(MessageCreateEventArgs args)
+        public async Task HandleMessageAsync(DiscordClient client, MessageCreateEventArgs args)
         {
-            if (args.Message.Author.Username == _botUsername)
+            if (args.Message.Author.Username == _botUsername || args.Message.Content.StartsWith("!"))
                 return;
 
-            switch (args.Message.Content)
+            //Analize all the possible emojis in the message
+            var possibleEmojis = new List<string>();
+
+            string[] parts = args.Message.Content.Split(':');
+            if (parts.Length > 2)
+            {
+                for (var i = 1; i < parts.Length - 1; i++)
+                {
+                    string part = parts[i];
+                    if (!part.Contains(' '))
+                    {
+                        possibleEmojis.Add($":{part}:");
+                    }
+                }
+            }
+
+            //Add all the possible emojis to the database
+            foreach (string emoji in possibleEmojis)
+            {
+                await _database.InsertEmojiAsync(emoji, args.Message.Author.Username, args.Message.Timestamp.UtcDateTime);
+            }
+
+            return;
+
+            /*switch (args.Message.Content)
             {
                 case "!help":
                     {
@@ -89,18 +114,7 @@ namespace DiscordSandbot.Discord
 
                         break;
                     }
-            }
-        }
-
-        private string GetListOfCommands()
-        {
-            var sb = new StringBuilder();
-            sb.AppendLine("List of commands: ");
-            sb.AppendLine();
-            sb.AppendLine("  -  !setup: Initializes the database if it isn't already initialized.");
-            sb.AppendLine("  -  !destroy: Destroys the tables and wipes the data.");
-
-            return sb.ToString();
+            }*/
         }
     }
 }

@@ -73,7 +73,7 @@ namespace DiscordSandbot.Database
         {
             using (var connection = new SqliteConnection(_configuration.ConnectionString))
             {
-                return await connection.QueryAsync("SELECT * FROM LogEmoji");
+                return await connection.QueryAsync<dynamic>("SELECT * FROM LogEmoji");
             }
         }
     }
