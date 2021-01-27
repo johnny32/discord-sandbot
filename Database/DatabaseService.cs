@@ -1,3 +1,5 @@
+using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -44,6 +46,34 @@ namespace DiscordSandbot.Database
             using (var connection = new SqliteConnection(_configuration.ConnectionString))
             {
                 await connection.ExecuteAsync("DROP TABLE LogEmoji");
+            }
+        }
+
+        public async Task InsertEmojiAsync(string emojiId, string username, DateTime timestamp)
+        {
+            using (var connection = new SqliteConnection(_configuration.ConnectionString))
+            {
+                var sb = new StringBuilder();
+                sb.Append(" INSERT INTO LogEmoji ");
+                sb.Append(" (Username, EmojiId, MessageTimestamp) ");
+                sb.Append(" VALUES (@username, @emojiId, @timestamp) ");
+
+                var parameters = new
+                {
+                    username,
+                    emojiId,
+                    timestamp
+                };
+
+                await connection.ExecuteAsync(sb.ToString(), parameters);
+            }
+        }
+
+        public async Task<IEnumerable<dynamic>> GetAllEmojisAsync()
+        {
+            using (var connection = new SqliteConnection(_configuration.ConnectionString))
+            {
+                return await connection.QueryAsync("SELECT * FROM LogEmoji");
             }
         }
     }

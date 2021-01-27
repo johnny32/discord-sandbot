@@ -1,20 +1,18 @@
 using System.Threading.Tasks;
-using DiscordSandbot.Database;
+using DiscordSandbot.Discord;
 using DSharpPlus;
-using DSharpPlus.EventArgs;
-using Microsoft.Extensions.Configuration;
 
 namespace DiscordSandbot
 {
     public class App
     {
         private readonly Configuration _configuration;
-        private readonly IDatabaseService _database;
+        private readonly IDiscordMessageHandler _discordMessageHandler;
 
-        public App(Configuration configuration, IDatabaseService database)
+        public App(Configuration configuration, IDiscordMessageHandler discordMessageHandler)
         {
             _configuration = configuration;
-            _database = database;
+            _discordMessageHandler = discordMessageHandler;
         }
 
         public async Task RunAsync()
@@ -25,22 +23,10 @@ namespace DiscordSandbot
                 TokenType = TokenType.Bot
             });
 
-            discord.MessageCreated += OnDiscordMessageCreated;
+            discord.MessageCreated += _discordMessageHandler.HandleMessageAsync;
 
             await discord.ConnectAsync();
             await Task.Delay(-1);
-        }
-
-        private async Task OnDiscordMessageCreated(MessageCreateEventArgs args)
-        {
-            if (args.Message.Content == "ping")
-                await args.Message.RespondAsync("pong");
-
-            if (args.Message.Content == "!setup")
-                await _database.SetupAsync();
-
-            if (args.Message.Content == "!destroy" && args.Message.Author.Username == "jooohnny32")
-                await _database.DestroyAsync();
         }
     }
 }

@@ -2,6 +2,7 @@
 using System.IO;
 using System.Threading.Tasks;
 using DiscordSandbot.Database;
+using DiscordSandbot.Discord;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -38,6 +39,7 @@ namespace DiscordSandbot
 
             services.AddSingleton<Configuration>(configuration);
             services.AddSingleton<IDatabaseService, DatabaseService>();
+            services.AddSingleton<IDiscordMessageHandler, DiscordMessageHandler>();
 
             services.AddTransient<App>();
         }
