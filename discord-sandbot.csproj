@@ -6,4 +6,8 @@
     <RootNamespace>discord_sandbot</RootNamespace>
   </PropertyGroup>
 
+  <ItemGroup>
+    <PackageReference Include="DSharpPlus" Version="3.2.3" />
+  </ItemGroup>
+
 </Project>
