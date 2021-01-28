@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using DiscordSandbot.Database;
+using DiscordSandbot.Models;
 using DSharpPlus;
 using DSharpPlus.EventArgs;
 
@@ -35,13 +36,33 @@ namespace DiscordSandbot.Discord
                     string[] parts = match.Value.Split(':');
                     string emoji = $":{parts[1]}:";
                     //Add all the possible emojis to the database
-                    await _database.InsertEmojiAsync(emoji, args.Message.Author.Username,
-                        TimeZoneInfo.ConvertTimeFromUtc(args.Message.Timestamp.UtcDateTime, TimeZoneInfo.FindSystemTimeZoneById("Romance Standard Time")));
+                    await _database.InsertEmojiAsync(new LogEmoji
+                    {
+                        EmojiId = emoji,
+                        Username = args.Message.Author.Username,
+                        MessageTimestamp = TimeZoneInfo.ConvertTimeFromUtc(args.Message.Timestamp.UtcDateTime, TimeZoneInfo.FindSystemTimeZoneById("Romance Standard Time")),
+                        IsReaction = false
+                    });
                 }
             }
             catch (Exception e)
             {
                 await args.Message.RespondAsync(e.Message);
+            }
+        }
+
+        public async Task HandleAddReactionAsync(DiscordClient client, MessageReactionAddEventArgs args)
+        {
+            if (args.Emoji.Id > 0L)
+            {
+                //It's a custom emoji
+                await _database.InsertEmojiAsync(new LogEmoji
+                {
+                    EmojiId = $":{args.Emoji.Name}:",
+                    Username = args.User.Username,
+                    MessageTimestamp = TimeZoneInfo.ConvertTimeFromUtc(args.Message.Timestamp.UtcDateTime, TimeZoneInfo.FindSystemTimeZoneById("Romance Standard Time")),
+                    IsReaction = true
+                });
             }
         }
     }

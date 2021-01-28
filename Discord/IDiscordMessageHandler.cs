@@ -7,5 +7,6 @@ namespace DiscordSandbot.Discord
     public interface IDiscordMessageHandler
     {
         Task HandleMessageAsync(DiscordClient client, MessageCreateEventArgs args);
+        Task HandleAddReactionAsync(DiscordClient client, MessageReactionAddEventArgs args);
     }
 }

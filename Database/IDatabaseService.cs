@@ -1,6 +1,6 @@
-using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using DiscordSandbot.Models;
 
 namespace DiscordSandbot.Database
 {
@@ -8,10 +8,10 @@ namespace DiscordSandbot.Database
     {
         Task SetupAsync();
         Task DestroyAsync();
-        Task InsertEmojiAsync(string emojiId, string username, DateTime timestamp);
-        Task<IEnumerable<dynamic>> GetAllEmojisAsync();
-        Task<IEnumerable<dynamic>> GetAllUsersOfEmojiAsync(string emojiId);
-        Task<IEnumerable<dynamic>> GetAllEmojisOfUserAsync(string username);
+        Task InsertEmojiAsync(LogEmoji emoji);
+        Task<IEnumerable<LogEmoji>> GetAllEmojisAsync();
+        Task<IEnumerable<LogEmoji>> GetAllUsersOfEmojiAsync(string emojiId);
+        Task<IEnumerable<LogEmoji>> GetAllEmojisOfUserAsync(string username);
         Task DeleteEmojiAsync(string emojiId);
     }
 }

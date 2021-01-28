@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Dapper;
+using DiscordSandbot.Models;
 using Microsoft.Data.Sqlite;
 
 namespace DiscordSandbot.Database
@@ -33,7 +34,8 @@ namespace DiscordSandbot.Database
                     sb.Append(" CREATE TABLE LogEmoji ( ");
                     sb.Append(" Username VARCHAR(30) NOT NULL, ");
                     sb.Append(" EmojiId VARCHAR(33) NOT NULL, ");
-                    sb.Append(" MessageTimestamp TIMESTAMP ");
+                    sb.Append(" MessageTimestamp TIMESTAMP, ");
+                    sb.Append(" IsReaction INTEGER ");
                     sb.Append(" ) ");
 
                     await connection.ExecuteAsync(sb.ToString());
@@ -49,35 +51,28 @@ namespace DiscordSandbot.Database
             }
         }
 
-        public async Task InsertEmojiAsync(string emojiId, string username, DateTime timestamp)
+        public async Task InsertEmojiAsync(LogEmoji emoji)
         {
             using (var connection = new SqliteConnection(_configuration.ConnectionString))
             {
                 var sb = new StringBuilder();
                 sb.Append(" INSERT INTO LogEmoji ");
-                sb.Append(" (Username, EmojiId, MessageTimestamp) ");
-                sb.Append(" VALUES (@username, @emojiId, @timestamp) ");
+                sb.Append(" (Username, EmojiId, MessageTimestamp, IsReaction) ");
+                sb.Append(" VALUES (@Username, @EmojiId, @MessageTimestamp, @IsReaction) ");
 
-                var parameters = new
-                {
-                    username,
-                    emojiId,
-                    timestamp
-                };
-
-                await connection.ExecuteAsync(sb.ToString(), parameters);
+                await connection.ExecuteAsync(sb.ToString(), emoji);
             }
         }
 
-        public async Task<IEnumerable<dynamic>> GetAllEmojisAsync()
+        public async Task<IEnumerable<LogEmoji>> GetAllEmojisAsync()
         {
             using (var connection = new SqliteConnection(_configuration.ConnectionString))
             {
-                return await connection.QueryAsync<dynamic>("SELECT * FROM LogEmoji");
+                return await connection.QueryAsync<LogEmoji>("SELECT * FROM LogEmoji");
             }
         }
 
-        public async Task<IEnumerable<dynamic>> GetAllUsersOfEmojiAsync(string emojiId)
+        public async Task<IEnumerable<LogEmoji>> GetAllUsersOfEmojiAsync(string emojiId)
         {
             using (var connection = new SqliteConnection(_configuration.ConnectionString))
             {
@@ -86,16 +81,11 @@ namespace DiscordSandbot.Database
                 sb.Append(" FROM LogEmoji ");
                 sb.Append(" WHERE EmojiId = @emojiId ");
 
-                var parameters = new
-                {
-                    emojiId
-                };
-
-                return await connection.QueryAsync<dynamic>(sb.ToString(), parameters);
+                return await connection.QueryAsync<LogEmoji>(sb.ToString(), new { emojiId });
             }
         }
 
-        public async Task<IEnumerable<dynamic>> GetAllEmojisOfUserAsync(string username)
+        public async Task<IEnumerable<LogEmoji>> GetAllEmojisOfUserAsync(string username)
         {
             using (var connection = new SqliteConnection(_configuration.ConnectionString))
             {
@@ -104,12 +94,7 @@ namespace DiscordSandbot.Database
                 sb.Append(" FROM LogEmoji ");
                 sb.Append(" WHERE Username = @username ");
 
-                var parameters = new
-                {
-                    username
-                };
-
-                return await connection.QueryAsync<dynamic>(sb.ToString(), parameters);
+                return await connection.QueryAsync<LogEmoji>(sb.ToString(), new { username });
             }
         }
 
@@ -122,12 +107,7 @@ namespace DiscordSandbot.Database
                 sb.Append(" FROM LogEmoji ");
                 sb.Append(" WHERE EmojiId = @emojiId ");
 
-                var parameters = new
-                {
-                    emojiId
-                };
-
-                await connection.ExecuteAsync(sb.ToString(), parameters);
+                await connection.ExecuteAsync(sb.ToString(), new { emojiId });
             }
         }
     }

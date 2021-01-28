@@ -93,7 +93,7 @@ namespace DiscordSandbot.Discord
                     .First()
                     .Key;
                 DateTime lastUsed = group
-                    .Select(row => DateTime.Parse(row.MessageTimestamp))
+                    .Select(row => row.MessageTimestamp)
                     .OrderByDescending(g => g)
                     .First();
 
@@ -121,7 +121,7 @@ namespace DiscordSandbot.Discord
             foreach (var group in groupByUser)
             {
                 DateTime lastUsed = group
-                    .Select(row => DateTime.Parse(row.MessageTimestamp))
+                    .Select(row => row.MessageTimestamp)
                     .OrderByDescending(g => g)
                     .First();
 
@@ -150,7 +150,7 @@ namespace DiscordSandbot.Discord
                 DiscordEmoji emoji = DiscordEmoji.FromName(context.Client, group.Key);
 
                 DateTime lastUsed = group
-                    .Select(row => DateTime.Parse(row.MessageTimestamp))
+                    .Select(row => row.MessageTimestamp)
                     .OrderByDescending(g => g)
                     .First();
 
