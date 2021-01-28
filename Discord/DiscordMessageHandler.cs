@@ -35,7 +35,8 @@ namespace DiscordSandbot.Discord
                     string[] parts = match.Value.Split(':');
                     string emoji = $":{parts[1]}:";
                     //Add all the possible emojis to the database
-                    await _database.InsertEmojiAsync(emoji, args.Message.Author.Username, args.Message.Timestamp.UtcDateTime);
+                    await _database.InsertEmojiAsync(emoji, args.Message.Author.Username,
+                        TimeZoneInfo.ConvertTimeFromUtc(args.Message.Timestamp.UtcDateTime, TimeZoneInfo.FindSystemTimeZoneById("Romance Standard Time")));
                 }
             }
             catch (Exception e)
