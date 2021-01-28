@@ -9,6 +9,7 @@ namespace DiscordSandbot.Database
         Task SetupAsync();
         Task DestroyAsync();
         Task InsertEmojiAsync(LogEmoji emoji);
+        Task RemoveEmojiAsync(LogEmoji emoji);
         Task<IEnumerable<LogEmoji>> GetAllEmojisAsync();
         Task<IEnumerable<LogEmoji>> GetAllUsersOfEmojiAsync(string emojiId);
         Task<IEnumerable<LogEmoji>> GetAllEmojisOfUserAsync(string username);

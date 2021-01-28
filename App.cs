@@ -34,6 +34,7 @@ namespace DiscordSandbot
 
             discord.MessageCreated += _discordMessageHandler.HandleMessageAsync;
             discord.MessageReactionAdded += _discordMessageHandler.HandleAddReactionAsync;
+            discord.MessageReactionRemoved += _discordMessageHandler.HandleRemoveReactionAsync;
 
             await discord.ConnectAsync();
             await Task.Delay(-1);

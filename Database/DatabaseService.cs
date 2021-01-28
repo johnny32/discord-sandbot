@@ -64,6 +64,21 @@ namespace DiscordSandbot.Database
             }
         }
 
+        public async Task RemoveEmojiAsync(LogEmoji emoji)
+        {
+            using (var connection = new SqliteConnection(_configuration.ConnectionString))
+            {
+                var sb = new StringBuilder();
+                sb.Append(" DELETE FROM LogEmoji ");
+                sb.Append(" WHERE EmojiId = @EmojiId ");
+                sb.Append(" AND Username = @Username ");
+                sb.Append(" AND MessageTimestamp = @MessageTimestamp ");
+                sb.Append(" AND IsReaction = @IsReaction ");
+
+                await connection.ExecuteAsync(sb.ToString(), emoji);
+            }
+        }
+
         public async Task<IEnumerable<LogEmoji>> GetAllEmojisAsync()
         {
             using (var connection = new SqliteConnection(_configuration.ConnectionString))

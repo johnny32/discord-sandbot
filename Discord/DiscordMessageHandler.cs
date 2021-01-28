@@ -65,5 +65,20 @@ namespace DiscordSandbot.Discord
                 });
             }
         }
+
+        public async Task HandleRemoveReactionAsync(DiscordClient client, MessageReactionRemoveEventArgs args)
+        {
+            if (args.Emoji.Id > 0L)
+            {
+                //It's a custom emoji
+                await _database.RemoveEmojiAsync(new LogEmoji
+                {
+                    EmojiId = $":{args.Emoji.Name}:",
+                    Username = args.User.Username,
+                    MessageTimestamp = TimeZoneInfo.ConvertTimeFromUtc(args.Message.Timestamp.UtcDateTime, TimeZoneInfo.FindSystemTimeZoneById("Romance Standard Time")),
+                    IsReaction = true
+                });
+            }
+        }
     }
 }

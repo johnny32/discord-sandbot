@@ -8,5 +8,6 @@ namespace DiscordSandbot.Discord
     {
         Task HandleMessageAsync(DiscordClient client, MessageCreateEventArgs args);
         Task HandleAddReactionAsync(DiscordClient client, MessageReactionAddEventArgs args);
+        Task HandleRemoveReactionAsync(DiscordClient client, MessageReactionRemoveEventArgs args);
     }
 }
