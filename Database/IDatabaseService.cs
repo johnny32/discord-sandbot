@@ -12,5 +12,6 @@ namespace DiscordSandbot.Database
         Task<IEnumerable<dynamic>> GetAllEmojisAsync();
         Task<IEnumerable<dynamic>> GetAllUsersOfEmojiAsync(string emojiId);
         Task<IEnumerable<dynamic>> GetAllEmojisOfUserAsync(string username);
+        Task DeleteEmojiAsync(string emojiId);
     }
 }

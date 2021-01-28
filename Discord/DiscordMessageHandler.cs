@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using DiscordSandbot.Database;
 using DSharpPlus;
@@ -11,10 +12,13 @@ namespace DiscordSandbot.Discord
     {
         private readonly IDatabaseService _database;
         private readonly string _botUsername = "Sandbot";
+        private readonly string _emojiPattern = @"<:.+?:\d+>";
+        private readonly Regex _regex;
 
         public DiscordMessageHandler(IDatabaseService database)
         {
             _database = database;
+            _regex = new Regex(_emojiPattern);
         }
 
         public async Task HandleMessageAsync(DiscordClient client, MessageCreateEventArgs args)
@@ -25,24 +29,12 @@ namespace DiscordSandbot.Discord
                     return;
 
                 //Analize all the possible emojis in the message
-                var possibleEmojis = new List<string>();
-
-                string[] parts = args.Message.Content.Split(':');
-                if (parts.Length > 2)
+                foreach (Match match in _regex.Matches(args.Message.Content))
                 {
-                    for (var i = 1; i < parts.Length - 1; i++)
-                    {
-                        string part = parts[i];
-                        if (!part.Contains(' '))
-                        {
-                            possibleEmojis.Add($":{part}:");
-                        }
-                    }
-                }
-
-                //Add all the possible emojis to the database
-                foreach (string emoji in possibleEmojis)
-                {
+                    //The emojis have the format <:emoji_name:emoji_id>, so I strip the emoji_name
+                    string[] parts = match.Value.Split(':');
+                    string emoji = $":{parts[1]}:";
+                    //Add all the possible emojis to the database
                     await _database.InsertEmojiAsync(emoji, args.Message.Author.Username, args.Message.Timestamp.UtcDateTime);
                 }
             }

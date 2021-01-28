@@ -112,5 +112,23 @@ namespace DiscordSandbot.Database
                 return await connection.QueryAsync<dynamic>(sb.ToString(), parameters);
             }
         }
+
+        public async Task DeleteEmojiAsync(string emojiId)
+        {
+            using (var connection = new SqliteConnection(_configuration.ConnectionString))
+            {
+                var sb = new StringBuilder();
+                sb.Append(" DELETE ");
+                sb.Append(" FROM LogEmoji ");
+                sb.Append(" WHERE EmojiId = @emojiId ");
+
+                var parameters = new
+                {
+                    emojiId
+                };
+
+                await connection.ExecuteAsync(sb.ToString(), parameters);
+            }
+        }
     }
 }

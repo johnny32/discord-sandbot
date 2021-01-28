@@ -28,6 +28,10 @@ namespace DiscordSandbot.Discord
             {
                 await _database.SetupAsync();
             }
+            else
+            {
+                await context.Message.RespondAsync($"Hold up! Only {_botAdminUsername} can use this command!");
+            }
         }
 
         [Command("destroy")]
@@ -37,6 +41,10 @@ namespace DiscordSandbot.Discord
             if (context.Message.Author.Username == _botAdminUsername)
             {
                 await _database.DestroyAsync();
+            }
+            else
+            {
+                await context.Message.RespondAsync($"Hold up! Only {_botAdminUsername} can use this command!");
             }
         }
 
@@ -150,6 +158,30 @@ namespace DiscordSandbot.Discord
             }
 
             await context.RespondAsync(sb.ToString());
+        }
+
+        [Command("deleteEmoji")]
+        [Description("Deletes all usage of a specific emoji")]
+        public async Task DeleteEmojiAsync(CommandContext context, string arg)
+        {
+            if (context.Message.Author.Username == _botAdminUsername)
+            {
+                if (arg.StartsWith('<') && arg.EndsWith('>') && arg.Count(c => c == ':') == 2)
+                {
+                    string[] parts = arg.Substring(1, arg.Length - 1).Split(':');
+                    await _database.DeleteEmojiAsync($":{parts[1]}:");
+                }
+                else
+                {
+                    //TODO Global exception handler?
+                    //throw new FormatException("Bad emoji format");
+                    await context.Message.RespondAsync("Bad emoji format");
+                }
+            }
+            else
+            {
+                await context.Message.RespondAsync($"Hold up! Only {_botAdminUsername} can use this command!");
+            }
         }
     }
 }
