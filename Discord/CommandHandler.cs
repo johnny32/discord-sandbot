@@ -83,10 +83,13 @@ namespace DiscordSandbot.Discord
                 .GroupBy(row => row.EmojiId)
                 .OrderByDescending(g => g.Count());
 
+            sb.AppendLine("Usage of all emojis:");
+
             foreach (var group in groupByEmoji)
             {
                 DiscordEmoji emoji = DiscordEmoji.FromName(context.Client, group.Key);
                 int totalTimes = group.Count();
+                int totalTimesAsReaction = group.Count(emoji => emoji.IsReaction);
                 string mostFrequentUser = group
                     .GroupBy(row => row.Username)
                     .OrderByDescending(g => g.Count())
@@ -97,7 +100,11 @@ namespace DiscordSandbot.Discord
                     .OrderByDescending(g => g)
                     .First();
 
-                sb.AppendLine($"{emoji} was used {totalTimes} times. The user that uses it the most is {mostFrequentUser}, and it was used last on {lastUsed.ToString("dd/MM/yyyy HH:mm:ss")}.");
+                sb.AppendLine();
+                sb.AppendLine($"{emoji}");
+                sb.AppendLine($"Used {totalTimes} times ({totalTimesAsReaction} of them as a reaction)");
+                sb.AppendLine($"Mainly used by {mostFrequentUser}");
+                sb.AppendLine($"Used last on {lastUsed.ToString("G")}");
             }
 
             await context.RespondAsync(sb.ToString());
@@ -120,12 +127,16 @@ namespace DiscordSandbot.Discord
 
             foreach (var group in groupByUser)
             {
+                int totalTimes = group.Count();
+                int totalTimesAsReaction = group.Count(emoji => emoji.IsReaction);
                 DateTime lastUsed = group
                     .Select(row => row.MessageTimestamp)
                     .OrderByDescending(g => g)
                     .First();
 
-                sb.AppendLine($"Used by {group.Key} a total of {group.Count()} times. It was used last on {lastUsed.ToString("dd/MM/yyyy HH:mm:ss")}.");
+                sb.AppendLine();
+                sb.AppendLine($"Used by {group.Key} a total of {totalTimes} times ({totalTimesAsReaction} of them as a reaction)");
+                sb.AppendLine($"Used last on {lastUsed.ToString("G")}");
             }
 
             await context.RespondAsync(sb.ToString());
@@ -148,13 +159,17 @@ namespace DiscordSandbot.Discord
             foreach (var group in groupByEmoji)
             {
                 DiscordEmoji emoji = DiscordEmoji.FromName(context.Client, group.Key);
-
+                int totalTimes = group.Count();
+                int totalTimesAsReaction = group.Count(emoji => emoji.IsReaction);
                 DateTime lastUsed = group
                     .Select(row => row.MessageTimestamp)
                     .OrderByDescending(g => g)
                     .First();
 
-                sb.AppendLine($"{emoji} a total of {group.Count()} times. It was used last on {lastUsed.ToString("dd/MM/yyyy HH:mm:ss")}.");
+                sb.AppendLine();
+                sb.AppendLine($"{emoji}");
+                sb.AppendLine($"Used a total of {totalTimes} times ({totalTimesAsReaction} of them as a reaction)");
+                sb.AppendLine($"Used last on {lastUsed.ToString("G")}.");
             }
 
             await context.RespondAsync(sb.ToString());
@@ -176,6 +191,39 @@ namespace DiscordSandbot.Discord
                     //TODO Global exception handler?
                     //throw new FormatException("Bad emoji format");
                     await context.Message.RespondAsync("Bad emoji format");
+                }
+            }
+            else
+            {
+                await context.Message.RespondAsync($"Hold up! Only {_botAdminUsername} can use this command!");
+            }
+        }
+
+        [Command("logEmojis")]
+        [Description("Prints the last X entries on the log table")]
+        public async Task LogEmojisAsync(CommandContext context, int numResults)
+        {
+            if (context.Message.Author.Username == _botAdminUsername)
+            {
+                if (numResults < -1)
+                {
+                    await context.Message.RespondAsync("numResults must be greater than -1");
+                }
+                else
+                {
+                    var emojis = await _database.LogEmojisAsync(numResults);
+
+                    var sb = new StringBuilder();
+                    sb.AppendLine($"Last {numResults} emojis used:");
+                    sb.AppendLine();
+
+                    foreach (var emoji in emojis)
+                    {
+                        DiscordEmoji emojiObj = DiscordEmoji.FromName(context.Client, emoji.EmojiId);
+                        sb.AppendLine($"{emoji.MessageTimestamp.ToString("G")}: {emoji.Username} used {emojiObj} {(emoji.IsReaction ? "as a reaction" : "in a message")}");
+                    }
+
+                    await context.Message.RespondAsync(sb.ToString());
                 }
             }
             else

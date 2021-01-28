@@ -125,5 +125,20 @@ namespace DiscordSandbot.Database
                 await connection.ExecuteAsync(sb.ToString(), new { emojiId });
             }
         }
+
+        public async Task<IEnumerable<LogEmoji>> LogEmojisAsync(int numResults)
+        {
+            using (var connection = new SqliteConnection(_configuration.ConnectionString))
+            {
+                var sb = new StringBuilder();
+                sb.Append(" SELECT * ");
+                sb.Append(" FROM LogEmoji ");
+                sb.Append(" ORDER BY MessageTimestamp DESC ");
+                if (numResults > -1)
+                    sb.Append($" LIMIT {numResults} ");
+
+                return await connection.QueryAsync<LogEmoji>(sb.ToString());
+            }
+        }
     }
 }
