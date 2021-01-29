@@ -46,6 +46,16 @@ namespace DiscordSandbot.Discord
                         IsReaction = false
                     });
                 }
+
+                string message = args.Message.Content.Replace("?", "").Replace("!", "").Replace(".", "").Replace("¡", "").Replace("¿", "").Replace("\"", "").Replace("'", "").Replace(")", "").TrimEnd().ToLowerInvariant();
+                if (message.EndsWith("ado"))
+                    await args.Message.RespondAsync($"{args.Message.Author.Mention} el que tengo aquí colgado");
+                else if (message.EndsWith("ada"))
+                    await args.Message.RespondAsync($"{args.Message.Author.Mention} la que tengo aquí colgada");
+                else if (message.EndsWith("ados"))
+                    await args.Message.RespondAsync($"{args.Message.Author.Mention} los que tengo aquí colgados");
+                else if (message.EndsWith("adas"))
+                    await args.Message.RespondAsync($"{args.Message.Author.Mention} las que tengo aquí colgadas");
             }
             catch (Exception e)
             {
