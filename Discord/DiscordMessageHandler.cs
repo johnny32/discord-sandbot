@@ -16,12 +16,14 @@ namespace DiscordSandbot.Discord
         private readonly string _botUsername = "Sandbot";
         private readonly string _emojiPattern = @"<:.+?:\d+>";
         private readonly Regex _regex;
+        private readonly Random _random;
 
         public DiscordMessageHandler(IDatabaseService database, Configuration configuration)
         {
             _database = database;
             _configuration = configuration;
             _regex = new Regex(_emojiPattern);
+            _random = new Random();
         }
 
         public async Task HandleMessageAsync(DiscordClient client, MessageCreateEventArgs args)
@@ -56,6 +58,14 @@ namespace DiscordSandbot.Discord
                     await args.Message.RespondAsync($"{args.Message.Author.Mention} los que tengo aquí colgados");
                 else if (message.EndsWith("adas"))
                     await args.Message.RespondAsync($"{args.Message.Author.Mention} las que tengo aquí colgadas");
+
+                /*double randomValue = _random.NextDouble();
+                if (randomValue < 0.001)
+                {
+                    var messageObj = await args.Message.RespondAsync($"{args.Message.Author.Mention} hijo de puta");
+                    await Task.Delay(1000);
+                    await messageObj.ModifyAsync($"{args.Message.Author.Mention} ~~hijo de puta~~ perdón");
+                }*/
             }
             catch (Exception e)
             {
