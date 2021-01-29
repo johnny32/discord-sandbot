@@ -12,13 +12,15 @@ namespace DiscordSandbot.Discord
     public class DiscordMessageHandler : IDiscordMessageHandler
     {
         private readonly IDatabaseService _database;
+        private readonly Configuration _configuration;
         private readonly string _botUsername = "Sandbot";
         private readonly string _emojiPattern = @"<:.+?:\d+>";
         private readonly Regex _regex;
 
-        public DiscordMessageHandler(IDatabaseService database)
+        public DiscordMessageHandler(IDatabaseService database, Configuration configuration)
         {
             _database = database;
+            _configuration = configuration;
             _regex = new Regex(_emojiPattern);
         }
 
@@ -26,7 +28,7 @@ namespace DiscordSandbot.Discord
         {
             try
             {
-                if (args.Message.Author.Username == _botUsername || args.Message.Content.StartsWith("!"))
+                if (args.Message.Author.Username == _botUsername || args.Message.Content.StartsWith(_configuration.CommandPrefix))
                     return;
 
                 //Analize all the possible emojis in the message

@@ -26,7 +26,7 @@ namespace DiscordSandbot
 
             var commands = discord.UseCommandsNext(new CommandsNextConfiguration
             {
-                StringPrefixes = new[] { "!" },
+                StringPrefixes = new[] { _configuration.CommandPrefix },
                 Services = Program.Services
             });
 
@@ -37,6 +37,7 @@ namespace DiscordSandbot
             discord.MessageReactionRemoved += _discordMessageHandler.HandleRemoveReactionAsync;
 
             await discord.ConnectAsync();
+
             await Task.Delay(-1);
         }
     }
