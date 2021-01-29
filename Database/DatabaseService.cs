@@ -40,6 +40,48 @@ namespace DiscordSandbot.Database
 
                     await connection.ExecuteAsync(sb.ToString());
                 }
+
+                sb.Clear();
+                sb.Append(" SELECT name ");
+                sb.Append(" FROM sqlite_master ");
+                sb.Append(" WHERE type = 'index' AND name = 'LogEmoji_EmojiId_Idx' ");
+                var index = await connection.QueryAsync<string>(sb.ToString());
+                if (!index.Any(name => name == "LogEmoji_EmojiId_Idx"))
+                {
+                    sb.Clear();
+                    sb.Append(" CREATE INDEX LogEmoji_EmojiId_Idx ");
+                    sb.Append(" ON LogEmoji(EmojiId) ");
+
+                    await connection.ExecuteAsync(sb.ToString());
+                }
+
+                sb.Clear();
+                sb.Append(" SELECT name ");
+                sb.Append(" FROM sqlite_master ");
+                sb.Append(" WHERE type = 'index' AND name = 'LogEmoji_MessageTimestamp_Idx' ");
+                index = await connection.QueryAsync<string>(sb.ToString());
+                if (!index.Any(name => name == "LogEmoji_MessageTimestamp_Idx"))
+                {
+                    sb.Clear();
+                    sb.Append(" CREATE INDEX LogEmoji_MessageTimestamp_Idx ");
+                    sb.Append(" ON LogEmoji(MessageTimestamp) ");
+
+                    await connection.ExecuteAsync(sb.ToString());
+                }
+
+                sb.Clear();
+                sb.Append(" SELECT name ");
+                sb.Append(" FROM sqlite_master ");
+                sb.Append(" WHERE type = 'index' AND name = 'LogEmoji_Username_Idx' ");
+                index = await connection.QueryAsync<string>(sb.ToString());
+                if (!index.Any(name => name == "LogEmoji_Username_Idx"))
+                {
+                    sb.Clear();
+                    sb.Append(" CREATE INDEX LogEmoji_Username_Idx ");
+                    sb.Append(" ON LogEmoji(Username) ");
+
+                    await connection.ExecuteAsync(sb.ToString());
+                }
             }
         }
 

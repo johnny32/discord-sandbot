@@ -1,4 +1,5 @@
 using System.Threading.Tasks;
+using DiscordSandbot.Database;
 using DiscordSandbot.Discord;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
@@ -9,11 +10,13 @@ namespace DiscordSandbot
     {
         private readonly Configuration _configuration;
         private readonly IDiscordMessageHandler _discordMessageHandler;
+        private readonly IDatabaseService _database;
 
-        public App(Configuration configuration, IDiscordMessageHandler discordMessageHandler)
+        public App(Configuration configuration, IDiscordMessageHandler discordMessageHandler, IDatabaseService database)
         {
             _configuration = configuration;
             _discordMessageHandler = discordMessageHandler;
+            _database = database;
         }
 
         public async Task RunAsync()
@@ -35,6 +38,8 @@ namespace DiscordSandbot
             discord.MessageCreated += _discordMessageHandler.HandleMessageAsync;
             discord.MessageReactionAdded += _discordMessageHandler.HandleAddReactionAsync;
             discord.MessageReactionRemoved += _discordMessageHandler.HandleRemoveReactionAsync;
+
+            await _database.SetupAsync();
 
             await discord.ConnectAsync();
 
