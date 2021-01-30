@@ -3,6 +3,7 @@ using DiscordSandbot.Database;
 using DiscordSandbot.Discord;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
+using DSharpPlus.Entities;
 using Microsoft.Extensions.Logging;
 
 namespace DiscordSandbot
@@ -49,7 +50,10 @@ namespace DiscordSandbot
 
             await _database.SetupAsync();
 
-            await discord.ConnectAsync();
+            var version = GetType().Assembly.GetName().Version;
+            var activity = new DiscordActivity($"!!help (v{version.Major}.{version.Minor}.{version.Build})", ActivityType.Watching);
+
+            await discord.ConnectAsync(activity);
 
             await Task.Delay(-1);
 
