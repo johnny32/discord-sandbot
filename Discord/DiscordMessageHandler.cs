@@ -65,13 +65,13 @@ namespace DiscordSandbot.Discord
                 else if (message.EndsWith("adas"))
                     await args.Message.RespondAsync($"{args.Message.Author.Mention} las que tengo aquí colgadas");
 
-                /*double randomValue = _random.NextDouble();
-                if (randomValue < 0.001)
+                double randomValue = _random.NextDouble();
+                if (randomValue < 0.00001)
                 {
                     var messageObj = await args.Message.RespondAsync($"{args.Message.Author.Mention} hijo de puta");
                     await Task.Delay(1000);
                     await messageObj.ModifyAsync($"{args.Message.Author.Mention} ~~hijo de puta~~ perdón");
-                }*/
+                }
             }
             catch (Exception e)
             {
