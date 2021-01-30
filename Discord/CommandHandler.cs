@@ -239,5 +239,14 @@ namespace DiscordSandbot.Discord
                 await context.Message.RespondAsync($"Hold up! Only {_botAdminUsername} can use this command!");
             }
         }
+
+        [Command("version")]
+        [Description("Prints the bot version")]
+        public async Task GetVersionAsync(CommandContext context)
+        {
+            _logger.LogInformation($"{context.Message.Author.Username} used the command version");
+            var version = GetType().Assembly.GetName().Version;
+            await context.Message.RespondAsync($"Sandbot version {version.Major}.{version.Minor}.{version.Build}");
+        }
     }
 }
