@@ -5,6 +5,9 @@ using DiscordSandbot.Database;
 using DiscordSandbot.Discord;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using Serilog;
+using Serilog.Core;
 
 namespace DiscordSandbot
 {
@@ -39,10 +42,21 @@ namespace DiscordSandbot
             ConfigurationBinder.Bind(builder, configuration);
 
             services.AddSingleton<Configuration>(configuration);
+
             services.AddSingleton<IDatabaseService, DatabaseService>();
             services.AddSingleton<IDiscordMessageHandler, DiscordMessageHandler>();
 
             services.AddTransient<App>();
+
+            Logger serilogLogger = new LoggerConfiguration()
+                .ReadFrom.Configuration(builder)
+                .CreateLogger();
+
+            services.AddLogging(builder =>
+            {
+                builder.SetMinimumLevel(LogLevel.Information);
+                builder.AddSerilog(serilogLogger, true);
+            });
         }
     }
 }

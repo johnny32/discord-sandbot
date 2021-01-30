@@ -7,16 +7,19 @@ using DiscordSandbot.Database;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
 using DSharpPlus.Entities;
+using Microsoft.Extensions.Logging;
 
 namespace DiscordSandbot.Discord
 {
     public class CommandHandler : BaseCommandModule
     {
+        private readonly ILogger _logger;
         private readonly IDatabaseService _database;
         private readonly string _botAdminUsername = "jooohnny32"; //For private functions
 
-        public CommandHandler(IDatabaseService database)
+        public CommandHandler(ILogger<CommandHandler> logger, IDatabaseService database)
         {
+            _logger = logger;
             _database = database;
         }
 
@@ -24,6 +27,7 @@ namespace DiscordSandbot.Discord
         [Description("Initializes the database if it isn't already initialized.")]
         public async Task SetupCommandAsync(CommandContext context)
         {
+            _logger.LogInformation($"{context.Message.Author.Username} used the command setup");
             if (context.Message.Author.Username == _botAdminUsername)
             {
                 await _database.SetupAsync();
@@ -38,6 +42,7 @@ namespace DiscordSandbot.Discord
         [Description("Destroys the tables and wipes the data.")]
         public async Task DestroyCommandAsync(CommandContext context)
         {
+            _logger.LogInformation($"{context.Message.Author.Username} used the command destroy");
             if (context.Message.Author.Username == _botAdminUsername)
             {
                 await _database.DestroyAsync();
@@ -52,6 +57,7 @@ namespace DiscordSandbot.Discord
         [Description("Lists all the custom emojis and ranks them by most used.")]
         public async Task ListEmojisAsync(CommandContext context, string arg = null)
         {
+            _logger.LogInformation($"{context.Message.Author.Username} used the command listEmojis with parameters \"{(string.IsNullOrEmpty(arg) ? "" : arg)}\"");
             try
             {
                 if (string.IsNullOrEmpty(arg) || arg.Contains(' '))
@@ -179,6 +185,7 @@ namespace DiscordSandbot.Discord
         [Description("Deletes all usage of a specific emoji")]
         public async Task DeleteEmojiAsync(CommandContext context, string arg)
         {
+            _logger.LogInformation($"{context.Message.Author.Username} used the command deleteEmoji with parameters \"{(string.IsNullOrEmpty(arg) ? "" : arg)}\"");
             if (context.Message.Author.Username == _botAdminUsername)
             {
                 if (arg.StartsWith('<') && arg.EndsWith('>') && arg.Count(c => c == ':') == 2)
@@ -203,6 +210,7 @@ namespace DiscordSandbot.Discord
         [Description("Prints the last X entries on the log table")]
         public async Task LogEmojisAsync(CommandContext context, int numResults)
         {
+            _logger.LogInformation($"{context.Message.Author.Username} used the command logEmojis with parameters \"{numResults}\"");
             if (context.Message.Author.Username == _botAdminUsername)
             {
                 if (numResults < -1)
@@ -230,6 +238,15 @@ namespace DiscordSandbot.Discord
             {
                 await context.Message.RespondAsync($"Hold up! Only {_botAdminUsername} can use this command!");
             }
+        }
+
+        [Command("version")]
+        [Description("Prints the bot version")]
+        public async Task GetVersionAsync(CommandContext context)
+        {
+            _logger.LogInformation($"{context.Message.Author.Username} used the command version");
+            var version = GetType().Assembly.GetName().Version;
+            await context.Message.RespondAsync($"Sandbot version {version.Major}.{version.Minor}.{version.Build}");
         }
     }
 }

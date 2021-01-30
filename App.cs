@@ -3,17 +3,24 @@ using DiscordSandbot.Database;
 using DiscordSandbot.Discord;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
+using DSharpPlus.Entities;
+using Microsoft.Extensions.Logging;
 
 namespace DiscordSandbot
 {
     public class App
     {
+        private readonly ILogger _logger;
         private readonly Configuration _configuration;
         private readonly IDiscordMessageHandler _discordMessageHandler;
         private readonly IDatabaseService _database;
 
-        public App(Configuration configuration, IDiscordMessageHandler discordMessageHandler, IDatabaseService database)
+        public App(ILogger<App> logger,
+            Configuration configuration,
+            IDiscordMessageHandler discordMessageHandler,
+            IDatabaseService database)
         {
+            _logger = logger;
             _configuration = configuration;
             _discordMessageHandler = discordMessageHandler;
             _database = database;
@@ -21,6 +28,8 @@ namespace DiscordSandbot
 
         public async Task RunAsync()
         {
+            _logger.LogInformation("Sandbot startup");
+
             var discord = new DiscordClient(new DiscordConfiguration()
             {
                 Token = _configuration.DiscordToken,
@@ -41,9 +50,14 @@ namespace DiscordSandbot
 
             await _database.SetupAsync();
 
-            await discord.ConnectAsync();
+            var version = GetType().Assembly.GetName().Version;
+            var activity = new DiscordActivity($"!!help (v{version.Major}.{version.Minor}.{version.Build})", ActivityType.Watching);
+
+            await discord.ConnectAsync(activity);
 
             await Task.Delay(-1);
+
+            _logger.LogCritical("Sandbot shutdown!");
         }
     }
 }

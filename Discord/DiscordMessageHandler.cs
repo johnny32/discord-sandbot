@@ -6,11 +6,13 @@ using DiscordSandbot.Database;
 using DiscordSandbot.Models;
 using DSharpPlus;
 using DSharpPlus.EventArgs;
+using Microsoft.Extensions.Logging;
 
 namespace DiscordSandbot.Discord
 {
     public class DiscordMessageHandler : IDiscordMessageHandler
     {
+        private readonly ILogger _logger;
         private readonly IDatabaseService _database;
         private readonly Configuration _configuration;
         private readonly string _botUsername = "Sandbot";
@@ -18,8 +20,9 @@ namespace DiscordSandbot.Discord
         private readonly Regex _regex;
         private readonly Random _random;
 
-        public DiscordMessageHandler(IDatabaseService database, Configuration configuration)
+        public DiscordMessageHandler(ILogger<DiscordMessageHandler> logger, IDatabaseService database, Configuration configuration)
         {
+            _logger = logger;
             _database = database;
             _configuration = configuration;
             _regex = new Regex(_emojiPattern);
@@ -39,6 +42,9 @@ namespace DiscordSandbot.Discord
                     //The emojis have the format <:emoji_name:emoji_id>, so I strip the emoji_name
                     string[] parts = match.Value.Split(':');
                     string emoji = $":{parts[1]}:";
+
+                    _logger.LogInformation($"{args.Message.Author.Username} wrote {emoji}");
+
                     //Add all the possible emojis to the database
                     await _database.InsertEmojiAsync(new LogEmoji
                     {
@@ -78,9 +84,12 @@ namespace DiscordSandbot.Discord
             if (args.Emoji.Id > 0L)
             {
                 //It's a custom emoji
+                var emoji = $":{args.Emoji.Name}:";
+                _logger.LogInformation($"{args.User.Username} reacted {emoji}");
+
                 await _database.InsertEmojiAsync(new LogEmoji
                 {
-                    EmojiId = $":{args.Emoji.Name}:",
+                    EmojiId = emoji,
                     Username = args.User.Username,
                     MessageTimestamp = TimeZoneInfo.ConvertTimeFromUtc(args.Message.Timestamp.UtcDateTime, TimeZoneInfo.FindSystemTimeZoneById("Romance Standard Time")),
                     IsReaction = true
@@ -93,6 +102,9 @@ namespace DiscordSandbot.Discord
             if (args.Emoji.Id > 0L)
             {
                 //It's a custom emoji
+                var emoji = $":{args.Emoji.Name}:";
+                _logger.LogInformation($"{args.User.Username} removed reaction {emoji}");
+
                 await _database.RemoveEmojiAsync(new LogEmoji
                 {
                     EmojiId = $":{args.Emoji.Name}:",

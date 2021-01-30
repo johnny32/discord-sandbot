@@ -355,3 +355,6 @@ appsettings.Local.json
 
 # SQLite database
 DiscordSandbot.db
+
+# Logs
+*.log
