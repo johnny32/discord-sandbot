@@ -15,7 +15,6 @@ namespace DiscordSandbot.Discord
         private readonly ILogger _logger;
         private readonly IDatabaseService _database;
         private readonly Configuration _configuration;
-        private readonly string _botUsername = "Sandbot";
         private readonly string _emojiPattern = @"<:.+?:\d+>";
         private readonly Regex _regex;
         private readonly Random _random;
@@ -33,7 +32,7 @@ namespace DiscordSandbot.Discord
         {
             try
             {
-                if (args.Message.Author.Username == _botUsername || args.Message.Content.StartsWith(_configuration.CommandPrefix))
+                if (args.Message.Author.Username == _configuration.BotUsername || args.Message.Content.StartsWith(_configuration.CommandPrefix))
                     return;
 
                 //Analize all the possible emojis in the message

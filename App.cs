@@ -1,3 +1,4 @@
+using System;
 using System.Threading.Tasks;
 using DiscordSandbot.Database;
 using DiscordSandbot.Discord;
@@ -29,6 +30,12 @@ namespace DiscordSandbot
         public async Task RunAsync()
         {
             _logger.LogInformation("Sandbot startup");
+
+            if (_configuration.DiscordToken == "MY TOKEN")
+            {
+                _logger.LogCritical("AppSettings not loaded correctly!");
+                throw new Exception("AppSettings not loaded correctly!");
+            }
 
             var discord = new DiscordClient(new DiscordConfiguration()
             {
