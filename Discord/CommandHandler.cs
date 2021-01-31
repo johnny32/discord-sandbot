@@ -27,14 +27,21 @@ namespace DiscordSandbot.Discord
         [Description("Initializes the database if it isn't already initialized.")]
         public async Task SetupCommandAsync(CommandContext context)
         {
-            _logger.LogInformation($"{context.Message.Author.Username} used the command setup");
-            if (context.Message.Author.Username == _botAdminUsername)
+            try
             {
-                await _database.SetupAsync();
+                _logger.LogInformation($"{context.Message.Author.Username} used the command setup");
+                if (context.Message.Author.Username == _botAdminUsername)
+                {
+                    await _database.SetupAsync();
+                }
+                else
+                {
+                    await context.Message.RespondAsync($"Hold up! Only {_botAdminUsername} can use this command!");
+                }
             }
-            else
+            catch (Exception e)
             {
-                await context.Message.RespondAsync($"Hold up! Only {_botAdminUsername} can use this command!");
+                _logger.LogError(e, "Exception on command setup");
             }
         }
 
@@ -42,14 +49,21 @@ namespace DiscordSandbot.Discord
         [Description("Destroys the tables and wipes the data.")]
         public async Task DestroyCommandAsync(CommandContext context)
         {
-            _logger.LogInformation($"{context.Message.Author.Username} used the command destroy");
-            if (context.Message.Author.Username == _botAdminUsername)
+            try
             {
-                await _database.DestroyAsync();
+                _logger.LogInformation($"{context.Message.Author.Username} used the command destroy");
+                if (context.Message.Author.Username == _botAdminUsername)
+                {
+                    await _database.DestroyAsync();
+                }
+                else
+                {
+                    await context.Message.RespondAsync($"Hold up! Only {_botAdminUsername} can use this command!");
+                }
             }
-            else
+            catch (Exception e)
             {
-                await context.Message.RespondAsync($"Hold up! Only {_botAdminUsername} can use this command!");
+                _logger.LogError(e, "Exception on command destroy");
             }
         }
 
@@ -57,9 +71,9 @@ namespace DiscordSandbot.Discord
         [Description("Lists all the custom emojis and ranks them by most used.")]
         public async Task ListEmojisAsync(CommandContext context, string arg = null)
         {
-            _logger.LogInformation($"{context.Message.Author.Username} used the command listEmojis with parameters \"{(string.IsNullOrEmpty(arg) ? "" : arg)}\"");
             try
             {
+                _logger.LogInformation($"{context.Message.Author.Username} used the command listEmojis with parameters \"{(string.IsNullOrEmpty(arg) ? "" : arg)}\"");
                 if (string.IsNullOrEmpty(arg) || arg.Contains(' '))
                     await ListAllEmojisAsync(context);
                 else if (arg.StartsWith('<') && arg.EndsWith('>') && arg.Count(c => c == ':') == 2)
@@ -72,7 +86,7 @@ namespace DiscordSandbot.Discord
             }
             catch (Exception e)
             {
-                await context.RespondAsync(e.Message);
+                _logger.LogError(e, $"Exception on command listEmojis (arg = \"{(arg == null ? "null" : arg)}\")");
             }
         }
 
@@ -183,60 +197,77 @@ namespace DiscordSandbot.Discord
 
         [Command("deleteEmoji")]
         [Description("Deletes all usage of a specific emoji")]
-        public async Task DeleteEmojiAsync(CommandContext context, string arg)
+        public async Task DeleteEmojiAsync(CommandContext context, string arg = null)
         {
-            _logger.LogInformation($"{context.Message.Author.Username} used the command deleteEmoji with parameters \"{(string.IsNullOrEmpty(arg) ? "" : arg)}\"");
-            if (context.Message.Author.Username == _botAdminUsername)
+            try
             {
-                if (arg.StartsWith('<') && arg.EndsWith('>') && arg.Count(c => c == ':') == 2)
+                _logger.LogInformation($"{context.Message.Author.Username} used the command deleteEmoji with parameters \"{(string.IsNullOrEmpty(arg) ? "" : arg)}\"");
+                if (context.Message.Author.Username == _botAdminUsername)
                 {
-                    string[] parts = arg.Substring(1, arg.Length - 1).Split(':');
-                    await _database.DeleteEmojiAsync($":{parts[1]}:");
+                    if (arg != null && arg.StartsWith('<') && arg.EndsWith('>') && arg.Count(c => c == ':') == 2)
+                    {
+                        string[] parts = arg.Substring(1, arg.Length - 1).Split(':');
+                        await _database.DeleteEmojiAsync($":{parts[1]}:");
+                    }
+                    else
+                    {
+                        throw new FormatException($"Bad emoji format: {(arg == null ? "null" : arg)}");
+                    }
                 }
                 else
                 {
-                    //TODO Global exception handler?
-                    //throw new FormatException("Bad emoji format");
-                    await context.Message.RespondAsync("Bad emoji format");
+                    await context.Message.RespondAsync($"Hold up! Only {_botAdminUsername} can use this command!");
                 }
             }
-            else
+            catch (Exception e)
             {
-                await context.Message.RespondAsync($"Hold up! Only {_botAdminUsername} can use this command!");
+                _logger.LogError(e, $"Exception on command deleteEmoji (arg = \"{(arg == null ? "null" : arg)}\")");
             }
         }
 
         [Command("logEmojis")]
         [Description("Prints the last X entries on the log table")]
-        public async Task LogEmojisAsync(CommandContext context, int numResults)
+        public async Task LogEmojisAsync(CommandContext context, int? numResults = null)
         {
-            _logger.LogInformation($"{context.Message.Author.Username} used the command logEmojis with parameters \"{numResults}\"");
-            if (context.Message.Author.Username == _botAdminUsername)
+            try
             {
-                if (numResults < -1)
+                _logger.LogInformation($"{context.Message.Author.Username} used the command logEmojis with parameters \"{(numResults == null ? "null" : numResults.Value.ToString())}\"");
+                if (context.Message.Author.Username == _botAdminUsername)
                 {
-                    await context.Message.RespondAsync("numResults must be greater than -1");
+                    if (numResults == null)
+                    {
+                        throw new ArgumentNullException("numResults");
+                    }
+
+                    if (numResults < -1)
+                    {
+                        await context.Message.RespondAsync("numResults must be greater than -1");
+                    }
+                    else
+                    {
+                        var emojis = await _database.LogEmojisAsync(numResults.Value);
+
+                        var sb = new StringBuilder();
+                        sb.AppendLine($"Last {numResults} emojis used:");
+                        sb.AppendLine();
+
+                        foreach (var emoji in emojis)
+                        {
+                            DiscordEmoji emojiObj = DiscordEmoji.FromName(context.Client, emoji.EmojiId);
+                            sb.AppendLine($"{emoji.MessageTimestamp.ToString("G")}: {emoji.Username} used {emojiObj} {(emoji.IsReaction ? "as a reaction" : "in a message")}");
+                        }
+
+                        await context.Message.RespondAsync(sb.ToString());
+                    }
                 }
                 else
                 {
-                    var emojis = await _database.LogEmojisAsync(numResults);
-
-                    var sb = new StringBuilder();
-                    sb.AppendLine($"Last {numResults} emojis used:");
-                    sb.AppendLine();
-
-                    foreach (var emoji in emojis)
-                    {
-                        DiscordEmoji emojiObj = DiscordEmoji.FromName(context.Client, emoji.EmojiId);
-                        sb.AppendLine($"{emoji.MessageTimestamp.ToString("G")}: {emoji.Username} used {emojiObj} {(emoji.IsReaction ? "as a reaction" : "in a message")}");
-                    }
-
-                    await context.Message.RespondAsync(sb.ToString());
+                    await context.Message.RespondAsync($"Hold up! Only {_botAdminUsername} can use this command!");
                 }
             }
-            else
+            catch (Exception e)
             {
-                await context.Message.RespondAsync($"Hold up! Only {_botAdminUsername} can use this command!");
+                _logger.LogError(e, $"Exception on command logEmojis (numResults = \"{(numResults == null ? "null" : numResults.Value.ToString())}\")");
             }
         }
 
@@ -244,9 +275,16 @@ namespace DiscordSandbot.Discord
         [Description("Prints the bot version")]
         public async Task GetVersionAsync(CommandContext context)
         {
-            _logger.LogInformation($"{context.Message.Author.Username} used the command version");
-            var version = GetType().Assembly.GetName().Version;
-            await context.Message.RespondAsync($"Sandbot version {version.Major}.{version.Minor}.{version.Build}");
+            try
+            {
+                _logger.LogInformation($"{context.Message.Author.Username} used the command version");
+                var version = GetType().Assembly.GetName().Version;
+                await context.Message.RespondAsync($"Sandbot version {version.Major}.{version.Minor}.{version.Build}");
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Exception on command version");
+            }
         }
     }
 }
