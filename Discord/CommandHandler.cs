@@ -15,12 +15,13 @@ namespace DiscordSandbot.Discord
     {
         private readonly ILogger _logger;
         private readonly IDatabaseService _database;
-        private readonly string _botAdminUsername = "jooohnny32"; //For private functions
+        private readonly Configuration _configuration;
 
-        public CommandHandler(ILogger<CommandHandler> logger, IDatabaseService database)
+        public CommandHandler(ILogger<CommandHandler> logger, IDatabaseService database, Configuration configuration)
         {
             _logger = logger;
             _database = database;
+            _configuration = configuration;
         }
 
         [Command("setup")]
@@ -30,13 +31,13 @@ namespace DiscordSandbot.Discord
             try
             {
                 _logger.LogInformation($"{context.Message.Author.Username} used the command setup");
-                if (context.Message.Author.Username == _botAdminUsername)
+                if (context.Message.Author.Username == _configuration.BotAdminUsername)
                 {
                     await _database.SetupAsync();
                 }
                 else
                 {
-                    await context.Message.RespondAsync($"Hold up! Only {_botAdminUsername} can use this command!");
+                    await context.Message.RespondAsync($"Hold up! Only {_configuration.BotAdminUsername} can use this command!");
                 }
             }
             catch (Exception e)
@@ -52,13 +53,13 @@ namespace DiscordSandbot.Discord
             try
             {
                 _logger.LogInformation($"{context.Message.Author.Username} used the command destroy");
-                if (context.Message.Author.Username == _botAdminUsername)
+                if (context.Message.Author.Username == _configuration.BotAdminUsername)
                 {
                     await _database.DestroyAsync();
                 }
                 else
                 {
-                    await context.Message.RespondAsync($"Hold up! Only {_botAdminUsername} can use this command!");
+                    await context.Message.RespondAsync($"Hold up! Only {_configuration.BotAdminUsername} can use this command!");
                 }
             }
             catch (Exception e)
@@ -202,7 +203,7 @@ namespace DiscordSandbot.Discord
             try
             {
                 _logger.LogInformation($"{context.Message.Author.Username} used the command deleteEmoji with parameters \"{(string.IsNullOrEmpty(arg) ? "" : arg)}\"");
-                if (context.Message.Author.Username == _botAdminUsername)
+                if (context.Message.Author.Username == _configuration.BotAdminUsername)
                 {
                     if (arg != null && arg.StartsWith('<') && arg.EndsWith('>') && arg.Count(c => c == ':') == 2)
                     {
@@ -216,7 +217,7 @@ namespace DiscordSandbot.Discord
                 }
                 else
                 {
-                    await context.Message.RespondAsync($"Hold up! Only {_botAdminUsername} can use this command!");
+                    await context.Message.RespondAsync($"Hold up! Only {_configuration.BotAdminUsername} can use this command!");
                 }
             }
             catch (Exception e)
@@ -232,7 +233,7 @@ namespace DiscordSandbot.Discord
             try
             {
                 _logger.LogInformation($"{context.Message.Author.Username} used the command logEmojis with parameters \"{(numResults == null ? "null" : numResults.Value.ToString())}\"");
-                if (context.Message.Author.Username == _botAdminUsername)
+                if (context.Message.Author.Username == _configuration.BotAdminUsername)
                 {
                     if (numResults == null)
                     {
@@ -241,7 +242,7 @@ namespace DiscordSandbot.Discord
 
                     if (numResults < -1)
                     {
-                        await context.Message.RespondAsync("numResults must be greater than -1");
+                        await context.Message.RespondAsync("numResults must be greater than or equal -1");
                     }
                     else
                     {
@@ -262,7 +263,7 @@ namespace DiscordSandbot.Discord
                 }
                 else
                 {
-                    await context.Message.RespondAsync($"Hold up! Only {_botAdminUsername} can use this command!");
+                    await context.Message.RespondAsync($"Hold up! Only {_configuration.BotAdminUsername} can use this command!");
                 }
             }
             catch (Exception e)
