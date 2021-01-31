@@ -55,13 +55,13 @@ namespace DiscordSandbot.Discord
                 }
 
                 string message = args.Message.Content.Replace("?", "").Replace("!", "").Replace(".", "").Replace("¡", "").Replace("¿", "").Replace("\"", "").Replace("'", "").Replace(")", "").TrimEnd().ToLowerInvariant();
-                if (message.EndsWith("ado"))
+                if (message.EndsWith("ado") && !message.EndsWith("colgado"))
                     await args.Message.RespondAsync($"{args.Message.Author.Mention} el que tengo aquí colgado");
-                else if (message.EndsWith("ada"))
+                else if (message.EndsWith("ada") && !message.EndsWith("colgada"))
                     await args.Message.RespondAsync($"{args.Message.Author.Mention} la que tengo aquí colgada");
-                else if (message.EndsWith("ados"))
+                else if (message.EndsWith("ados") && !message.EndsWith("colgados"))
                     await args.Message.RespondAsync($"{args.Message.Author.Mention} los que tengo aquí colgados");
-                else if (message.EndsWith("adas"))
+                else if (message.EndsWith("adas") && !message.EndsWith("colgadas"))
                     await args.Message.RespondAsync($"{args.Message.Author.Mention} las que tengo aquí colgadas");
 
                 double randomValue = _random.NextDouble();
