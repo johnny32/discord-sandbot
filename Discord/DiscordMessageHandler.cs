@@ -8,6 +8,7 @@ using DSharpPlus;
 using DSharpPlus.Entities;
 using DSharpPlus.EventArgs;
 using Microsoft.Extensions.Logging;
+using TimeZoneConverter;
 
 namespace DiscordSandbot.Discord
 {
@@ -60,7 +61,7 @@ namespace DiscordSandbot.Discord
                     {
                         EmojiId = emoji,
                         Username = args.Message.Author.Username,
-                        MessageTimestamp = TimeZoneInfo.ConvertTimeFromUtc(args.Message.Timestamp.UtcDateTime, TimeZoneInfo.FindSystemTimeZoneById("Romance Standard Time")),
+                        MessageTimestamp = TimeZoneInfo.ConvertTimeFromUtc(args.Message.Timestamp.UtcDateTime, TZConvert.GetTimeZoneInfo("Romance Standard Time")),
                         IsReaction = false
                     });
                 }
@@ -112,7 +113,7 @@ namespace DiscordSandbot.Discord
                 {
                     EmojiId = emoji,
                     Username = args.User.Username,
-                    MessageTimestamp = TimeZoneInfo.ConvertTimeFromUtc(args.Message.Timestamp.UtcDateTime, TimeZoneInfo.FindSystemTimeZoneById("Romance Standard Time")),
+                    MessageTimestamp = TimeZoneInfo.ConvertTimeFromUtc(args.Message.Timestamp.UtcDateTime, TZConvert.GetTimeZoneInfo("Romance Standard Time")),
                     IsReaction = true
                 });
             }
@@ -141,7 +142,7 @@ namespace DiscordSandbot.Discord
                 {
                     EmojiId = $":{args.Emoji.Name}:",
                     Username = args.User.Username,
-                    MessageTimestamp = TimeZoneInfo.ConvertTimeFromUtc(args.Message.Timestamp.UtcDateTime, TimeZoneInfo.FindSystemTimeZoneById("Romance Standard Time")),
+                    MessageTimestamp = TimeZoneInfo.ConvertTimeFromUtc(args.Message.Timestamp.UtcDateTime, TZConvert.GetTimeZoneInfo("Romance Standard Time")),
                     IsReaction = true
                 });
             }
