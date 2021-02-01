@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using DiscordSandbot.Database;
 using DiscordSandbot.Models;
 using DSharpPlus;
+using DSharpPlus.Entities;
 using DSharpPlus.EventArgs;
 using Microsoft.Extensions.Logging;
 
@@ -41,6 +42,16 @@ namespace DiscordSandbot.Discord
                     //The emojis have the format <:emoji_name:emoji_id>, so I strip the emoji_name
                     string[] parts = match.Value.Split(':');
                     string emoji = $":{parts[1]}:";
+
+                    try
+                    {
+                        var emojiObj = DiscordEmoji.FromName(client, emoji);
+                    }
+                    catch (ArgumentException)
+                    {
+                        _logger.LogInformation($"{args.Message.Author.Username} wrote an emoji not present on this server: {emoji}. Ignoring...");
+                        return;
+                    }
 
                     _logger.LogInformation($"{args.Message.Author.Username} wrote {emoji}");
 
@@ -84,6 +95,17 @@ namespace DiscordSandbot.Discord
             {
                 //It's a custom emoji
                 var emoji = $":{args.Emoji.Name}:";
+
+                try
+                {
+                    var emojiObj = DiscordEmoji.FromName(client, emoji);
+                }
+                catch (ArgumentException)
+                {
+                    _logger.LogInformation($"{args.Message.Author.Username} reacted with an emoji not present on this server: {emoji}. Ignoring...");
+                    return;
+                }
+
                 _logger.LogInformation($"{args.User.Username} reacted {emoji}");
 
                 await _database.InsertEmojiAsync(new LogEmoji
@@ -102,6 +124,17 @@ namespace DiscordSandbot.Discord
             {
                 //It's a custom emoji
                 var emoji = $":{args.Emoji.Name}:";
+
+                try
+                {
+                    var emojiObj = DiscordEmoji.FromName(client, emoji);
+                }
+                catch (ArgumentException)
+                {
+                    _logger.LogInformation($"{args.Message.Author.Username} removed a reaction of an emoji not present on this server: {emoji}. Ignoring...");
+                    return;
+                }
+
                 _logger.LogInformation($"{args.User.Username} removed reaction {emoji}");
 
                 await _database.RemoveEmojiAsync(new LogEmoji
