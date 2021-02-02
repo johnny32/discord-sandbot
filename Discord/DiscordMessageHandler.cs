@@ -51,7 +51,7 @@ namespace DiscordSandbot.Discord
                     catch (ArgumentException)
                     {
                         _logger.LogInformation($"{args.Message.Author.Username} wrote an emoji not present on this server: {emoji}. Ignoring...");
-                        return;
+                        continue;
                     }
 
                     _logger.LogInformation($"{args.Message.Author.Username} wrote {emoji}");
