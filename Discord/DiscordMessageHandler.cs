@@ -67,14 +67,16 @@ namespace DiscordSandbot.Discord
                 }
 
                 string message = args.Message.Content.Replace("?", "").Replace("!", "").Replace(".", "").Replace("¡", "").Replace("¿", "").Replace("\"", "").Replace("'", "").Replace(")", "").TrimEnd().ToLowerInvariant();
-                if (message.EndsWith("ado") && !message.EndsWith("colgado"))
+                if (message.EndsWith("gado") && !message.EndsWith("colgado"))
                     await args.Message.RespondAsync($"{args.Message.Author.Mention} el que tengo aquí colgado");
-                else if (message.EndsWith("ada") && !message.EndsWith("colgada"))
+                else if (message.EndsWith("gada") && !message.EndsWith("colgada"))
                     await args.Message.RespondAsync($"{args.Message.Author.Mention} la que tengo aquí colgada");
-                else if (message.EndsWith("ados") && !message.EndsWith("colgados"))
+                else if (message.EndsWith("gados") && !message.EndsWith("colgados"))
                     await args.Message.RespondAsync($"{args.Message.Author.Mention} los que tengo aquí colgados");
-                else if (message.EndsWith("adas") && !message.EndsWith("colgadas"))
+                else if (message.EndsWith("gadas") && !message.EndsWith("colgadas"))
                     await args.Message.RespondAsync($"{args.Message.Author.Mention} las que tengo aquí colgadas");
+                else if (message.EndsWith(" concurso"))
+                    await args.Message.RespondAsync($"{args.Message.Author.Mention} el de levantar mi polla a pulso");
 
                 double randomValue = _random.NextDouble();
                 if (randomValue < 0.00001)
