@@ -46,28 +46,6 @@ namespace DiscordSandbot.Discord
             }
         }
 
-        [Command("destroy")]
-        [Description("Destroys the tables and wipes the data.")]
-        public async Task DestroyCommandAsync(CommandContext context)
-        {
-            try
-            {
-                _logger.LogInformation($"{context.Message.Author.Username} used the command destroy");
-                if (context.Message.Author.Username == _configuration.BotAdminUsername)
-                {
-                    await _database.DestroyAsync();
-                }
-                else
-                {
-                    await context.Message.RespondAsync($"Hold up! Only {_configuration.BotAdminUsername} can use this command!");
-                }
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, "Exception on command destroy");
-            }
-        }
-
         [Command("listEmojis")]
         [Description("Lists all the custom emojis and ranks them by most used.")]
         public async Task ListEmojisAsync(CommandContext context, string arg = null)
@@ -126,9 +104,16 @@ namespace DiscordSandbot.Discord
                 sb.AppendLine($"Used {totalTimes} times ({totalTimesAsReaction} of them as a reaction)");
                 sb.AppendLine($"Mainly used by {mostFrequentUser}");
                 sb.AppendLine($"Used last on {lastUsed.ToString("G")}");
+
+                if (sb.Length >= 1900)
+                {
+                    await context.RespondAsync(sb.ToString());
+                    sb.Clear();
+                }
             }
 
-            await context.RespondAsync(sb.ToString());
+            if (sb.Length > 0)
+                await context.RespondAsync(sb.ToString());
         }
 
         private async Task ListAllUsersOfEmojiAsync(CommandContext context, string emojiId)
@@ -158,9 +143,16 @@ namespace DiscordSandbot.Discord
                 sb.AppendLine();
                 sb.AppendLine($"Used by {group.Key} a total of {totalTimes} times ({totalTimesAsReaction} of them as a reaction)");
                 sb.AppendLine($"Used last on {lastUsed.ToString("G")}");
+
+                if (sb.Length >= 1900)
+                {
+                    await context.RespondAsync(sb.ToString());
+                    sb.Clear();
+                }
             }
 
-            await context.RespondAsync(sb.ToString());
+            if (sb.Length > 0)
+                await context.RespondAsync(sb.ToString());
         }
 
         private async Task ListAllEmojisOfUserAsync(CommandContext context, string username)
@@ -191,9 +183,16 @@ namespace DiscordSandbot.Discord
                 sb.AppendLine($"{emoji}");
                 sb.AppendLine($"Used a total of {totalTimes} times ({totalTimesAsReaction} of them as a reaction)");
                 sb.AppendLine($"Used last on {lastUsed.ToString("G")}.");
+
+                if (sb.Length >= 1900)
+                {
+                    await context.RespondAsync(sb.ToString());
+                    sb.Clear();
+                }
             }
 
-            await context.RespondAsync(sb.ToString());
+            if (sb.Length > 0)
+                await context.RespondAsync(sb.ToString());
         }
 
         [Command("deleteEmoji")]
@@ -256,9 +255,16 @@ namespace DiscordSandbot.Discord
                         {
                             DiscordEmoji emojiObj = DiscordEmoji.FromName(context.Client, emoji.EmojiId);
                             sb.AppendLine($"{emoji.MessageTimestamp.ToString("G")}: {emoji.Username} used {emojiObj} {(emoji.IsReaction ? "as a reaction" : "in a message")}");
+
+                            if (sb.Length >= 1900)
+                            {
+                                await context.RespondAsync(sb.ToString());
+                                sb.Clear();
+                            }
                         }
 
-                        await context.Message.RespondAsync(sb.ToString());
+                        if (sb.Length > 0)
+                            await context.Message.RespondAsync(sb.ToString());
                     }
                 }
                 else
