@@ -105,7 +105,7 @@ namespace DiscordSandbot.Discord
                 sb.AppendLine($"Mainly used by {mostFrequentUser}");
                 sb.AppendLine($"Used last on {lastUsed.ToString("G")}");
 
-                if (sb.Length >= 1900)
+                if (sb.Length >= 1500)
                 {
                     await context.RespondAsync(sb.ToString());
                     sb.Clear();
@@ -144,7 +144,7 @@ namespace DiscordSandbot.Discord
                 sb.AppendLine($"Used by {group.Key} a total of {totalTimes} times ({totalTimesAsReaction} of them as a reaction)");
                 sb.AppendLine($"Used last on {lastUsed.ToString("G")}");
 
-                if (sb.Length >= 1900)
+                if (sb.Length >= 1500)
                 {
                     await context.RespondAsync(sb.ToString());
                     sb.Clear();
@@ -184,7 +184,7 @@ namespace DiscordSandbot.Discord
                 sb.AppendLine($"Used a total of {totalTimes} times ({totalTimesAsReaction} of them as a reaction)");
                 sb.AppendLine($"Used last on {lastUsed.ToString("G")}.");
 
-                if (sb.Length >= 1900)
+                if (sb.Length >= 1500)
                 {
                     await context.RespondAsync(sb.ToString());
                     sb.Clear();
@@ -256,7 +256,7 @@ namespace DiscordSandbot.Discord
                             DiscordEmoji emojiObj = DiscordEmoji.FromName(context.Client, emoji.EmojiId);
                             sb.AppendLine($"{emoji.MessageTimestamp.ToString("G")}: {emoji.Username} used {emojiObj} {(emoji.IsReaction ? "as a reaction" : "in a message")}");
 
-                            if (sb.Length >= 1900)
+                            if (sb.Length >= 1500)
                             {
                                 await context.RespondAsync(sb.ToString());
                                 sb.Clear();
