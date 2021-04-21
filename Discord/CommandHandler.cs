@@ -4,6 +4,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Dapper;
 using DiscordSandbot.Database;
+using DiscordSandbot.HarterQuotes;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
 using DSharpPlus.Entities;
@@ -15,12 +16,18 @@ namespace DiscordSandbot.Discord
     {
         private readonly ILogger _logger;
         private readonly IDatabaseService _database;
+        private readonly IHarterQuotesService _harterQuotesService;
         private readonly Configuration _configuration;
 
-        public CommandHandler(ILogger<CommandHandler> logger, IDatabaseService database, Configuration configuration)
+        public CommandHandler(
+            ILogger<CommandHandler> logger,
+            IDatabaseService database,
+            IHarterQuotesService harterQuotesService,
+            Configuration configuration)
         {
             _logger = logger;
             _database = database;
+            _harterQuotesService = harterQuotesService;
             _configuration = configuration;
         }
 
@@ -275,6 +282,20 @@ namespace DiscordSandbot.Discord
             catch (Exception e)
             {
                 _logger.LogError(e, $"Exception on command logEmojis (numResults = \"{(numResults == null ? "null" : numResults.Value.ToString())}\")");
+            }
+        }
+
+        [Command("harter")]
+        [Description("Prints a random Harter quote")]
+        public async Task GetRandomHarterQuoteAsync(CommandContext context)
+        {
+            try
+            {
+                await _harterQuotesService.GetRandomQuoteAsync(context);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Exception on command harter");
             }
         }
 
