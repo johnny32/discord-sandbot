@@ -1,8 +1,10 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using DiscordSandbot.Database;
+using DiscordSandbot.Helpers;
 using DiscordSandbot.Models;
 using DSharpPlus;
 using DSharpPlus.Entities;
@@ -20,6 +22,8 @@ namespace DiscordSandbot.Discord
         private readonly string _emojiPattern = @"<:.+?:\d+>";
         private readonly Regex _regex;
         private readonly Random _random;
+        private readonly LimitedQueue<DiscordMessage> _lastMessagesQueue;
+        private const int LAST_MESSAGES_QUEUE_CAPACITY = 3;
 
         public DiscordMessageHandler(ILogger<DiscordMessageHandler> logger, IDatabaseService database, Configuration configuration)
         {
@@ -28,6 +32,7 @@ namespace DiscordSandbot.Discord
             _configuration = configuration;
             _regex = new Regex(_emojiPattern);
             _random = new Random();
+            _lastMessagesQueue = new LimitedQueue<DiscordMessage>(LAST_MESSAGES_QUEUE_CAPACITY);
         }
 
         public async Task HandleMessageAsync(DiscordClient client, MessageCreateEventArgs args)
@@ -77,6 +82,16 @@ namespace DiscordSandbot.Discord
                     await args.Message.RespondAsync($"{args.Message.Author.Mention} las que tengo aquí colgadas");
                 else if (message.EndsWith(" concurso"))
                     await args.Message.RespondAsync($"{args.Message.Author.Mention} el de levantar mi polla a pulso");
+
+                _lastMessagesQueue.Enqueue(args.Message);
+                if (_lastMessagesQueue.Count == LAST_MESSAGES_QUEUE_CAPACITY
+                    && _lastMessagesQueue.All(message => !message.Content.Any(c => Char.IsLower(c))
+                        && message.Content.Count(c => Char.IsUpper(c)) > message.Content.Count(c => !Char.IsUpper(c))
+                        && message.Author.Equals(_lastMessagesQueue.First().Author)))
+                {
+                    await args.Message.RespondAsync($"{args.Message.Author.Mention} cálmate, estás montando una escenita.");
+                    _lastMessagesQueue.Clear();
+                }
 
                 double randomValue = _random.NextDouble();
                 if (randomValue < 0.00001)
