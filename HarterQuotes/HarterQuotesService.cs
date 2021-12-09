@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.Threading.Tasks;
 using DSharpPlus.CommandsNext;
+using DSharpPlus.Entities;
 using Microsoft.Extensions.Logging;
 
 namespace DiscordSandbot.HarterQuotes
@@ -23,7 +24,12 @@ namespace DiscordSandbot.HarterQuotes
         {
             string[] files = Directory.GetFiles(_configuration.HarterQuotesPath);
             string selectedFile = files[_random.Next(files.Length)];
-            await context.Message.RespondWithFileAsync(selectedFile);
+            using (FileStream stream = new(selectedFile, FileMode.Open, FileAccess.Read))
+            {
+                DiscordMessage builder = await new DiscordMessageBuilder()
+                    .WithFile(selectedFile, stream)
+                    .SendAsync(context.Channel);
+            }
         }
     }
 }
