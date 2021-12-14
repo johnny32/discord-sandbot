@@ -22,7 +22,7 @@ namespace DiscordSandbot.HoffmanQuotes
         public async Task GetRandomQuoteAsync(CommandContext context)
         {
             string[] quotes = File.ReadAllLines(_configuration.HoffmanQuotesPath);
-            await context.Message.RespondAsync(quotes[_random.Next(quotes.Length)], false, null, null);
+            await context.Message.RespondAsync(quotes[_random.Next(quotes.Length)]);
         }
     }
 }
