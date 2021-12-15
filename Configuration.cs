@@ -8,5 +8,6 @@ namespace DiscordSandbot
         public string ConnectionString { get; set; }
         public string CommandPrefix { get; set; }
         public string HarterQuotesPath { get; set; }
+        public string HoffmanQuotesPath { get; set; }
     }
 }

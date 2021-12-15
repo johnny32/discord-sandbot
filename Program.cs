@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using DiscordSandbot.Database;
 using DiscordSandbot.Discord;
 using DiscordSandbot.HarterQuotes;
+using DiscordSandbot.HoffmanQuotes;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -47,6 +48,7 @@ namespace DiscordSandbot
             services.AddSingleton<IDatabaseService, DatabaseService>();
             services.AddSingleton<IDiscordMessageHandler, DiscordMessageHandler>();
             services.AddSingleton<IHarterQuotesService, HarterQuotesService>();
+            services.AddSingleton<IHoffmanQuotesService, HoffmanQuotesService>();
 
             services.AddTransient<App>();
 

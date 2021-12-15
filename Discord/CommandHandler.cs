@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Dapper;
 using DiscordSandbot.Database;
 using DiscordSandbot.HarterQuotes;
+using DiscordSandbot.HoffmanQuotes;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
 using DSharpPlus.Entities;
@@ -17,17 +18,20 @@ namespace DiscordSandbot.Discord
         private readonly ILogger _logger;
         private readonly IDatabaseService _database;
         private readonly IHarterQuotesService _harterQuotesService;
+        private readonly IHoffmanQuotesService _hoffmanQuotesService;
         private readonly Configuration _configuration;
 
         public CommandHandler(
             ILogger<CommandHandler> logger,
             IDatabaseService database,
             IHarterQuotesService harterQuotesService,
+            IHoffmanQuotesService hoffmanQuotesService,
             Configuration configuration)
         {
             _logger = logger;
             _database = database;
             _harterQuotesService = harterQuotesService;
+            _hoffmanQuotesService = hoffmanQuotesService;
             _configuration = configuration;
         }
 
@@ -296,6 +300,20 @@ namespace DiscordSandbot.Discord
             catch (Exception e)
             {
                 _logger.LogError(e, "Exception on command harter");
+            }
+        }
+
+        [Command("hoffman")]
+        [Description("Prints a random Hoffman quote")]
+        public async Task GetRandomHoffmanQuoteAsync(CommandContext context)
+        {
+            try
+            {
+                await _hoffmanQuotesService.GetRandomQuoteAsync(context);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Exception on command hoffman");
             }
         }
 
