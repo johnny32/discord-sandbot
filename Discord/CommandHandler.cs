@@ -31,6 +31,7 @@ namespace DiscordSandbot.Discord
             _logger = logger;
             _database = database;
             _harterQuotesService = harterQuotesService;
+            _hoffmanQuotesService = hoffmanQuotesService;
             _configuration = configuration;
         }
 
