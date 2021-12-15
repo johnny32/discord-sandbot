@@ -25,6 +25,7 @@ namespace DiscordSandbot.Discord
             ILogger<CommandHandler> logger,
             IDatabaseService database,
             IHarterQuotesService harterQuotesService,
+            IHoffmanQuotesService hoffmanQuotesService,
             Configuration configuration)
         {
             _logger = logger;
