@@ -47,6 +47,7 @@ namespace DiscordSandbot
             services.AddSingleton<IDatabaseService, DatabaseService>();
             services.AddSingleton<IDiscordMessageHandler, DiscordMessageHandler>();
             services.AddSingleton<IHarterQuotesService, HarterQuotesService>();
+            services.AddSingleton<IHoffmanQuotesService, HoffmanQuotesService>();
 
             services.AddTransient<App>();
 
