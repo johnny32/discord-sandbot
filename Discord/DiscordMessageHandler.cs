@@ -82,6 +82,8 @@ namespace DiscordSandbot.Discord
                     await args.Message.RespondAsync($"{args.Message.Author.Mention} las que tengo aquí colgadas");
                 else if (message.EndsWith(" concurso"))
                     await args.Message.RespondAsync($"{args.Message.Author.Mention} el de levantar mi polla a pulso");
+                else if (message.EndsWith("ano") && !message.EndsWith(" mano"))
+                    await args.Message.RespondAsync($"{args.Message.Author.Mention} me la agarras con la mano");
 
                 _lastMessagesQueue.Enqueue(args.Message);
                 if (_lastMessagesQueue.Count == LAST_MESSAGES_QUEUE_CAPACITY
