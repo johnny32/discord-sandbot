@@ -77,6 +77,8 @@ namespace DiscordSandbot.Discord
                     await args.Message.RespondAsync($"{args.Message.Author.Mention} las que tengo aquí colgadas");
                 else if (message.EndsWith(" concurso"))
                     await args.Message.RespondAsync($"{args.Message.Author.Mention} el de levantar mi polla a pulso");
+                else if (message.EndsWith("ano") && !message.EndsWith(" mano"))
+                    await args.Message.RespondAsync($"{args.Message.Author.Mention} me la agarras con la mano");
 
                 double randomValue = _random.NextDouble();
                 if (randomValue < 0.00001)
