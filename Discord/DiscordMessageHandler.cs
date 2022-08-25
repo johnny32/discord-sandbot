@@ -51,7 +51,7 @@ namespace DiscordSandbot.Discord
 
                     try
                     {
-                        var emojiObj = DiscordEmoji.FromName(client, emoji);
+                        DiscordEmoji emojiObj = DiscordEmoji.FromName(client, emoji);
                     }
                     catch (ArgumentException)
                     {
@@ -98,7 +98,7 @@ namespace DiscordSandbot.Discord
                 double randomValue = _random.NextDouble();
                 if (randomValue < 0.00001)
                 {
-                    var messageObj = await args.Message.RespondAsync($"{args.Message.Author.Mention} hijo de puta");
+                    DiscordMessage messageObj = await args.Message.RespondAsync($"{args.Message.Author.Mention} hijo de puta");
                     await Task.Delay(1000);
                     await messageObj.ModifyAsync($"{args.Message.Author.Mention} ~~hijo de puta~~ perdón");
                 }
@@ -114,11 +114,11 @@ namespace DiscordSandbot.Discord
             if (args.Emoji.Id > 0L)
             {
                 //It's a custom emoji
-                var emoji = $":{args.Emoji.Name}:";
+                string emoji = $":{args.Emoji.Name}:";
 
                 try
                 {
-                    var emojiObj = DiscordEmoji.FromName(client, emoji);
+                    DiscordEmoji emojiObj = DiscordEmoji.FromName(client, emoji);
                 }
                 catch (ArgumentException)
                 {
@@ -143,11 +143,11 @@ namespace DiscordSandbot.Discord
             if (args.Emoji.Id > 0L)
             {
                 //It's a custom emoji
-                var emoji = $":{args.Emoji.Name}:";
+                string emoji = $":{args.Emoji.Name}:";
 
                 try
                 {
-                    var emojiObj = DiscordEmoji.FromName(client, emoji);
+                    DiscordEmoji emojiObj = DiscordEmoji.FromName(client, emoji);
                 }
                 catch (ArgumentException)
                 {

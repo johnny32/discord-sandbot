@@ -23,7 +23,7 @@ namespace DiscordSandbot
 
         private static async Task MainAsync()
         {
-            var serviceCollection = new ServiceCollection();
+            ServiceCollection serviceCollection = new();
             ConfigureServices(serviceCollection);
 
             Services = serviceCollection.BuildServiceProvider();
@@ -33,13 +33,13 @@ namespace DiscordSandbot
 
         private static void ConfigureServices(IServiceCollection services)
         {
-            var builder = new ConfigurationBuilder()
+            IConfigurationRoot builder = new ConfigurationBuilder()
                 .SetBasePath(Directory.GetParent(AppContext.BaseDirectory).FullName)
                 .AddJsonFile("appsettings.json", false)
                 .AddJsonFile("appsettings.Local.json", true)
                 .Build();
 
-            var configuration = new Configuration();
+            Configuration configuration = new();
 
             ConfigurationBinder.Bind(builder, configuration);
 

@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -6,6 +7,7 @@ using Dapper;
 using DiscordSandbot.Database;
 using DiscordSandbot.HarterQuotes;
 using DiscordSandbot.HoffmanQuotes;
+using DiscordSandbot.Models;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
 using DSharpPlus.Entities;
@@ -82,20 +84,20 @@ namespace DiscordSandbot.Discord
 
         private async Task ListAllEmojisAsync(CommandContext context)
         {
-            var results = await _database.GetAllEmojisAsync();
+            IEnumerable<LogEmoji> results = await _database.GetAllEmojisAsync();
 
             if (!results.Any())
                 return;
 
-            var sb = new StringBuilder();
+            StringBuilder builder = new();
 
-            var groupByEmoji = results
+            IOrderedEnumerable<IGrouping<string, LogEmoji>> groupByEmoji = results
                 .GroupBy(row => row.EmojiId)
                 .OrderByDescending(g => g.Count());
 
-            sb.AppendLine("Usage of all emojis:");
+            builder.AppendLine("Usage of all emojis:");
 
-            foreach (var group in groupByEmoji)
+            foreach (IGrouping<string, LogEmoji> group in groupByEmoji)
             {
                 DiscordEmoji emoji = DiscordEmoji.FromName(context.Client, group.Key);
                 int totalTimes = group.Count();
@@ -110,39 +112,39 @@ namespace DiscordSandbot.Discord
                     .OrderByDescending(g => g)
                     .First();
 
-                sb.AppendLine();
-                sb.AppendLine($"{emoji}");
-                sb.AppendLine($"Used {totalTimes} times ({totalTimesAsReaction} of them as a reaction)");
-                sb.AppendLine($"Mainly used by {mostFrequentUser}");
-                sb.AppendLine($"Used last on {lastUsed.ToString("G")}");
+                builder.AppendLine();
+                builder.AppendLine($"{emoji}");
+                builder.AppendLine($"Used {totalTimes} times ({totalTimesAsReaction} of them as a reaction)");
+                builder.AppendLine($"Mainly used by {mostFrequentUser}");
+                builder.AppendLine($"Used last on {lastUsed.ToString("G")}");
 
-                if (sb.Length >= 1500)
+                if (builder.Length >= 1500)
                 {
-                    await context.RespondAsync(sb.ToString());
-                    sb.Clear();
+                    await context.RespondAsync(builder.ToString());
+                    builder.Clear();
                 }
             }
 
-            if (sb.Length > 0)
-                await context.RespondAsync(sb.ToString());
+            if (builder.Length > 0)
+                await context.RespondAsync(builder.ToString());
         }
 
         private async Task ListAllUsersOfEmojiAsync(CommandContext context, string emojiId)
         {
-            var results = await _database.GetAllUsersOfEmojiAsync(emojiId);
+            IEnumerable<LogEmoji> results = await _database.GetAllUsersOfEmojiAsync(emojiId);
 
             if (!results.Any())
                 return;
 
-            var sb = new StringBuilder();
+            StringBuilder builder = new();
             DiscordEmoji emoji = DiscordEmoji.FromName(context.Client, emojiId);
-            sb.AppendLine($"Total uses of {emoji}: {results.Count()}");
+            builder.AppendLine($"Total uses of {emoji}: {results.Count()}");
 
-            var groupByUser = results
+            IOrderedEnumerable<IGrouping<string, LogEmoji>> groupByUser = results
                 .GroupBy(row => row.Username)
                 .OrderByDescending(g => g.Count());
 
-            foreach (var group in groupByUser)
+            foreach (IGrouping<string, LogEmoji> group in groupByUser)
             {
                 int totalTimes = group.Count();
                 int totalTimesAsReaction = group.Count(emoji => emoji.IsReaction);
@@ -151,36 +153,36 @@ namespace DiscordSandbot.Discord
                     .OrderByDescending(g => g)
                     .First();
 
-                sb.AppendLine();
-                sb.AppendLine($"Used by {group.Key} a total of {totalTimes} times ({totalTimesAsReaction} of them as a reaction)");
-                sb.AppendLine($"Used last on {lastUsed.ToString("G")}");
+                builder.AppendLine();
+                builder.AppendLine($"Used by {group.Key} a total of {totalTimes} times ({totalTimesAsReaction} of them as a reaction)");
+                builder.AppendLine($"Used last on {lastUsed.ToString("G")}");
 
-                if (sb.Length >= 1500)
+                if (builder.Length >= 1500)
                 {
-                    await context.RespondAsync(sb.ToString());
-                    sb.Clear();
+                    await context.RespondAsync(builder.ToString());
+                    builder.Clear();
                 }
             }
 
-            if (sb.Length > 0)
-                await context.RespondAsync(sb.ToString());
+            if (builder.Length > 0)
+                await context.RespondAsync(builder.ToString());
         }
 
         private async Task ListAllEmojisOfUserAsync(CommandContext context, string username)
         {
-            var results = await _database.GetAllEmojisOfUserAsync(username);
+            IEnumerable<LogEmoji> results = await _database.GetAllEmojisOfUserAsync(username);
 
             if (!results.Any())
                 return;
 
-            var sb = new StringBuilder();
-            sb.AppendLine($"{username} has used the emojis:");
+            StringBuilder builder = new();
+            builder.AppendLine($"{username} has used the emojis:");
 
-            var groupByEmoji = results
+            IOrderedEnumerable<IGrouping<string, LogEmoji>> groupByEmoji = results
                 .GroupBy(row => row.EmojiId)
                 .OrderByDescending(g => g.Count());
 
-            foreach (var group in groupByEmoji)
+            foreach (IGrouping<string, LogEmoji> group in groupByEmoji)
             {
                 DiscordEmoji emoji = DiscordEmoji.FromName(context.Client, group.Key);
                 int totalTimes = group.Count();
@@ -190,20 +192,20 @@ namespace DiscordSandbot.Discord
                     .OrderByDescending(g => g)
                     .First();
 
-                sb.AppendLine();
-                sb.AppendLine($"{emoji}");
-                sb.AppendLine($"Used a total of {totalTimes} times ({totalTimesAsReaction} of them as a reaction)");
-                sb.AppendLine($"Used last on {lastUsed.ToString("G")}.");
+                builder.AppendLine();
+                builder.AppendLine($"{emoji}");
+                builder.AppendLine($"Used a total of {totalTimes} times ({totalTimesAsReaction} of them as a reaction)");
+                builder.AppendLine($"Used last on {lastUsed.ToString("G")}.");
 
-                if (sb.Length >= 1500)
+                if (builder.Length >= 1500)
                 {
-                    await context.RespondAsync(sb.ToString());
-                    sb.Clear();
+                    await context.RespondAsync(builder.ToString());
+                    builder.Clear();
                 }
             }
 
-            if (sb.Length > 0)
-                await context.RespondAsync(sb.ToString());
+            if (builder.Length > 0)
+                await context.RespondAsync(builder.ToString());
         }
 
         [Command("deleteEmoji")]
@@ -256,26 +258,26 @@ namespace DiscordSandbot.Discord
                     }
                     else
                     {
-                        var emojis = await _database.LogEmojisAsync(numResults.Value);
+                        IEnumerable<LogEmoji> emojis = await _database.LogEmojisAsync(numResults.Value);
 
-                        var sb = new StringBuilder();
-                        sb.AppendLine($"Last {numResults} emojis used:");
-                        sb.AppendLine();
+                        StringBuilder builder = new();
+                        builder.AppendLine($"Last {numResults} emojis used:");
+                        builder.AppendLine();
 
-                        foreach (var emoji in emojis)
+                        foreach (LogEmoji emoji in emojis)
                         {
                             DiscordEmoji emojiObj = DiscordEmoji.FromName(context.Client, emoji.EmojiId);
-                            sb.AppendLine($"{emoji.MessageTimestamp.ToString("G")}: {emoji.Username} used {emojiObj} {(emoji.IsReaction ? "as a reaction" : "in a message")}");
+                            builder.AppendLine($"{emoji.MessageTimestamp.ToString("G")}: {emoji.Username} used {emojiObj} {(emoji.IsReaction ? "as a reaction" : "in a message")}");
 
-                            if (sb.Length >= 1500)
+                            if (builder.Length >= 1500)
                             {
-                                await context.RespondAsync(sb.ToString());
-                                sb.Clear();
+                                await context.RespondAsync(builder.ToString());
+                                builder.Clear();
                             }
                         }
 
-                        if (sb.Length > 0)
-                            await context.Message.RespondAsync(sb.ToString());
+                        if (builder.Length > 0)
+                            await context.Message.RespondAsync(builder.ToString());
                     }
                 }
                 else
@@ -324,7 +326,7 @@ namespace DiscordSandbot.Discord
             try
             {
                 _logger.LogInformation($"{context.Message.Author.Username} used the command version");
-                var version = GetType().Assembly.GetName().Version;
+                Version version = GetType().Assembly.GetName().Version;
                 await context.Message.RespondAsync($"Sandbot version {version.Major}.{version.Minor}.{version.Build}");
             }
             catch (Exception e)

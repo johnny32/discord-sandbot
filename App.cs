@@ -37,13 +37,13 @@ namespace DiscordSandbot
                 throw new Exception("AppSettings not loaded correctly!");
             }
 
-            var discord = new DiscordClient(new DiscordConfiguration()
+            DiscordClient discord = new(new DiscordConfiguration()
             {
                 Token = _configuration.DiscordToken,
                 TokenType = TokenType.Bot
             });
 
-            var commands = discord.UseCommandsNext(new CommandsNextConfiguration
+            CommandsNextExtension commands = discord.UseCommandsNext(new CommandsNextConfiguration
             {
                 StringPrefixes = new[] { _configuration.CommandPrefix },
                 Services = Program.Services
@@ -57,8 +57,8 @@ namespace DiscordSandbot
 
             await _database.SetupAsync();
 
-            var version = GetType().Assembly.GetName().Version;
-            var activity = new DiscordActivity($"!!help (v{version.Major}.{version.Minor}.{version.Build})", ActivityType.Watching);
+            Version version = GetType().Assembly.GetName().Version;
+            DiscordActivity activity = new($"!!help (v{version.Major}.{version.Minor}.{version.Build})", ActivityType.Watching);
 
             await discord.ConnectAsync(activity);
 

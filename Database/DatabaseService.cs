@@ -20,74 +20,74 @@ namespace DiscordSandbot.Database
 
         public async Task SetupAsync()
         {
-            using (var connection = new SqliteConnection(_configuration.ConnectionString))
+            using (SqliteConnection connection = new(_configuration.ConnectionString))
             {
-                var sb = new StringBuilder();
-                sb.Append(" SELECT name ");
-                sb.Append(" FROM sqlite_master ");
-                sb.Append(" WHERE type = 'table' AND name = 'LogEmoji' ");
+                StringBuilder builder = new();
+                builder.Append(" SELECT name ");
+                builder.Append(" FROM sqlite_master ");
+                builder.Append(" WHERE type = 'table' AND name = 'LogEmoji' ");
 
-                var table = await connection.QueryAsync<string>(sb.ToString());
+                IEnumerable<string> table = await connection.QueryAsync<string>(builder.ToString());
                 if (!table.Any(name => name == "LogEmoji"))
                 {
-                    sb.Clear();
-                    sb.Append(" CREATE TABLE LogEmoji ( ");
-                    sb.Append(" Username VARCHAR(30) NOT NULL, ");
-                    sb.Append(" EmojiId VARCHAR(33) NOT NULL, ");
-                    sb.Append(" MessageTimestamp TIMESTAMP, ");
-                    sb.Append(" IsReaction INTEGER ");
-                    sb.Append(" ) ");
+                    builder.Clear();
+                    builder.Append(" CREATE TABLE LogEmoji ( ");
+                    builder.Append(" Username VARCHAR(30) NOT NULL, ");
+                    builder.Append(" EmojiId VARCHAR(33) NOT NULL, ");
+                    builder.Append(" MessageTimestamp TIMESTAMP, ");
+                    builder.Append(" IsReaction INTEGER ");
+                    builder.Append(" ) ");
 
-                    await connection.ExecuteAsync(sb.ToString());
+                    await connection.ExecuteAsync(builder.ToString());
                 }
 
-                sb.Clear();
-                sb.Append(" SELECT name ");
-                sb.Append(" FROM sqlite_master ");
-                sb.Append(" WHERE type = 'index' AND name = 'LogEmoji_EmojiId_Idx' ");
-                var index = await connection.QueryAsync<string>(sb.ToString());
+                builder.Clear();
+                builder.Append(" SELECT name ");
+                builder.Append(" FROM sqlite_master ");
+                builder.Append(" WHERE type = 'index' AND name = 'LogEmoji_EmojiId_Idx' ");
+                IEnumerable<string> index = await connection.QueryAsync<string>(builder.ToString());
                 if (!index.Any(name => name == "LogEmoji_EmojiId_Idx"))
                 {
-                    sb.Clear();
-                    sb.Append(" CREATE INDEX LogEmoji_EmojiId_Idx ");
-                    sb.Append(" ON LogEmoji(EmojiId) ");
+                    builder.Clear();
+                    builder.Append(" CREATE INDEX LogEmoji_EmojiId_Idx ");
+                    builder.Append(" ON LogEmoji(EmojiId) ");
 
-                    await connection.ExecuteAsync(sb.ToString());
+                    await connection.ExecuteAsync(builder.ToString());
                 }
 
-                sb.Clear();
-                sb.Append(" SELECT name ");
-                sb.Append(" FROM sqlite_master ");
-                sb.Append(" WHERE type = 'index' AND name = 'LogEmoji_MessageTimestamp_Idx' ");
-                index = await connection.QueryAsync<string>(sb.ToString());
+                builder.Clear();
+                builder.Append(" SELECT name ");
+                builder.Append(" FROM sqlite_master ");
+                builder.Append(" WHERE type = 'index' AND name = 'LogEmoji_MessageTimestamp_Idx' ");
+                index = await connection.QueryAsync<string>(builder.ToString());
                 if (!index.Any(name => name == "LogEmoji_MessageTimestamp_Idx"))
                 {
-                    sb.Clear();
-                    sb.Append(" CREATE INDEX LogEmoji_MessageTimestamp_Idx ");
-                    sb.Append(" ON LogEmoji(MessageTimestamp) ");
+                    builder.Clear();
+                    builder.Append(" CREATE INDEX LogEmoji_MessageTimestamp_Idx ");
+                    builder.Append(" ON LogEmoji(MessageTimestamp) ");
 
-                    await connection.ExecuteAsync(sb.ToString());
+                    await connection.ExecuteAsync(builder.ToString());
                 }
 
-                sb.Clear();
-                sb.Append(" SELECT name ");
-                sb.Append(" FROM sqlite_master ");
-                sb.Append(" WHERE type = 'index' AND name = 'LogEmoji_Username_Idx' ");
-                index = await connection.QueryAsync<string>(sb.ToString());
+                builder.Clear();
+                builder.Append(" SELECT name ");
+                builder.Append(" FROM sqlite_master ");
+                builder.Append(" WHERE type = 'index' AND name = 'LogEmoji_Username_Idx' ");
+                index = await connection.QueryAsync<string>(builder.ToString());
                 if (!index.Any(name => name == "LogEmoji_Username_Idx"))
                 {
-                    sb.Clear();
-                    sb.Append(" CREATE INDEX LogEmoji_Username_Idx ");
-                    sb.Append(" ON LogEmoji(Username) ");
+                    builder.Clear();
+                    builder.Append(" CREATE INDEX LogEmoji_Username_Idx ");
+                    builder.Append(" ON LogEmoji(Username) ");
 
-                    await connection.ExecuteAsync(sb.ToString());
+                    await connection.ExecuteAsync(builder.ToString());
                 }
             }
         }
 
         public async Task DestroyAsync()
         {
-            using (var connection = new SqliteConnection(_configuration.ConnectionString))
+            using (SqliteConnection connection = new(_configuration.ConnectionString))
             {
                 await connection.ExecuteAsync("DROP TABLE LogEmoji");
             }
@@ -95,35 +95,35 @@ namespace DiscordSandbot.Database
 
         public async Task InsertEmojiAsync(LogEmoji emoji)
         {
-            using (var connection = new SqliteConnection(_configuration.ConnectionString))
+            using (SqliteConnection connection = new(_configuration.ConnectionString))
             {
-                var sb = new StringBuilder();
-                sb.Append(" INSERT INTO LogEmoji ");
-                sb.Append(" (Username, EmojiId, MessageTimestamp, IsReaction) ");
-                sb.Append(" VALUES (@Username, @EmojiId, @MessageTimestamp, @IsReaction) ");
+                StringBuilder builder = new();
+                builder.Append(" INSERT INTO LogEmoji ");
+                builder.Append(" (Username, EmojiId, MessageTimestamp, IsReaction) ");
+                builder.Append(" VALUES (@Username, @EmojiId, @MessageTimestamp, @IsReaction) ");
 
-                await connection.ExecuteAsync(sb.ToString(), emoji);
+                await connection.ExecuteAsync(builder.ToString(), emoji);
             }
         }
 
         public async Task RemoveEmojiAsync(LogEmoji emoji)
         {
-            using (var connection = new SqliteConnection(_configuration.ConnectionString))
+            using (SqliteConnection connection = new(_configuration.ConnectionString))
             {
-                var sb = new StringBuilder();
-                sb.Append(" DELETE FROM LogEmoji ");
-                sb.Append(" WHERE EmojiId = @EmojiId ");
-                sb.Append(" AND Username = @Username ");
-                sb.Append(" AND MessageTimestamp = @MessageTimestamp ");
-                sb.Append(" AND IsReaction = @IsReaction ");
+                StringBuilder builder = new();
+                builder.Append(" DELETE FROM LogEmoji ");
+                builder.Append(" WHERE EmojiId = @EmojiId ");
+                builder.Append(" AND Username = @Username ");
+                builder.Append(" AND MessageTimestamp = @MessageTimestamp ");
+                builder.Append(" AND IsReaction = @IsReaction ");
 
-                await connection.ExecuteAsync(sb.ToString(), emoji);
+                await connection.ExecuteAsync(builder.ToString(), emoji);
             }
         }
 
         public async Task<IEnumerable<LogEmoji>> GetAllEmojisAsync()
         {
-            using (var connection = new SqliteConnection(_configuration.ConnectionString))
+            using (SqliteConnection connection = new(_configuration.ConnectionString))
             {
                 return await connection.QueryAsync<LogEmoji>("SELECT * FROM LogEmoji");
             }
@@ -131,55 +131,55 @@ namespace DiscordSandbot.Database
 
         public async Task<IEnumerable<LogEmoji>> GetAllUsersOfEmojiAsync(string emojiId)
         {
-            using (var connection = new SqliteConnection(_configuration.ConnectionString))
+            using (SqliteConnection connection = new(_configuration.ConnectionString))
             {
-                var sb = new StringBuilder();
-                sb.Append(" SELECT * ");
-                sb.Append(" FROM LogEmoji ");
-                sb.Append(" WHERE EmojiId = @emojiId ");
+                StringBuilder builder = new();
+                builder.Append(" SELECT * ");
+                builder.Append(" FROM LogEmoji ");
+                builder.Append(" WHERE EmojiId = @emojiId ");
 
-                return await connection.QueryAsync<LogEmoji>(sb.ToString(), new { emojiId });
+                return await connection.QueryAsync<LogEmoji>(builder.ToString(), new { emojiId });
             }
         }
 
         public async Task<IEnumerable<LogEmoji>> GetAllEmojisOfUserAsync(string username)
         {
-            using (var connection = new SqliteConnection(_configuration.ConnectionString))
+            using (SqliteConnection connection = new(_configuration.ConnectionString))
             {
-                var sb = new StringBuilder();
-                sb.Append(" SELECT * ");
-                sb.Append(" FROM LogEmoji ");
-                sb.Append(" WHERE Username = @username ");
+                StringBuilder builder = new();
+                builder.Append(" SELECT * ");
+                builder.Append(" FROM LogEmoji ");
+                builder.Append(" WHERE Username = @username ");
 
-                return await connection.QueryAsync<LogEmoji>(sb.ToString(), new { username });
+                return await connection.QueryAsync<LogEmoji>(builder.ToString(), new { username });
             }
         }
 
         public async Task DeleteEmojiAsync(string emojiId)
         {
-            using (var connection = new SqliteConnection(_configuration.ConnectionString))
+            using (SqliteConnection connection = new(_configuration.ConnectionString))
             {
-                var sb = new StringBuilder();
-                sb.Append(" DELETE ");
-                sb.Append(" FROM LogEmoji ");
-                sb.Append(" WHERE EmojiId = @emojiId ");
+                StringBuilder builder = new();
+                builder.Append(" DELETE ");
+                builder.Append(" FROM LogEmoji ");
+                builder.Append(" WHERE EmojiId = @emojiId ");
 
-                await connection.ExecuteAsync(sb.ToString(), new { emojiId });
+                await connection.ExecuteAsync(builder.ToString(), new { emojiId });
             }
         }
 
         public async Task<IEnumerable<LogEmoji>> LogEmojisAsync(int numResults)
         {
-            using (var connection = new SqliteConnection(_configuration.ConnectionString))
+            using (SqliteConnection connection = new(_configuration.ConnectionString))
             {
-                var sb = new StringBuilder();
-                sb.Append(" SELECT * ");
-                sb.Append(" FROM LogEmoji ");
-                sb.Append(" ORDER BY MessageTimestamp DESC ");
+                StringBuilder builder = new();
+                builder.Append(" SELECT * ");
+                builder.Append(" FROM LogEmoji ");
+                builder.Append(" ORDER BY MessageTimestamp DESC ");
                 if (numResults > -1)
-                    sb.Append($" LIMIT {numResults} ");
+                    builder.Append($" LIMIT {numResults} ");
 
-                return await connection.QueryAsync<LogEmoji>(sb.ToString());
+                return await connection.QueryAsync<LogEmoji>(builder.ToString());
             }
         }
     }
