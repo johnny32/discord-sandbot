@@ -358,3 +358,6 @@ DiscordSandbot.db
 
 # Logs
 *.log
+
+# .NET documentation
+documentation.xml
